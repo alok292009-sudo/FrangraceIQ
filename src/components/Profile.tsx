@@ -3,7 +3,7 @@ import { auth, db, OperationType, handleFirestoreError } from '../lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { collection, query, where, getDocs, orderBy, limit, Timestamp, deleteDoc, doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { History, Star, User as UserIcon, LogOut, Clock, ChevronRight, Bookmark, ArrowUpDown, Sparkles } from 'lucide-react';
+import { History, Star, User as UserIcon, LogOut, Clock, ChevronRight, Bookmark, ArrowUpDown, Sparkles, Trash2, AlertTriangle, X } from 'lucide-react';
 import { generateUserAvatar } from '../lib/geminiClient';
 
 interface PastSearch {
@@ -47,6 +47,8 @@ const Profile: React.FC<ProfileProps> = ({ onClose, onSearchAgain }) => {
   const [savedSort, setSavedSort] = useState<'date' | 'name' | 'brand' | 'score'>('date');
   const [customAvatar, setCustomAvatar] = useState<string | null>(null);
   const [isGeneratingAvatar, setIsGeneratingAvatar] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{id: string, name: string} | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
@@ -144,6 +146,19 @@ const Profile: React.FC<ProfileProps> = ({ onClose, onSearchAgain }) => {
     }
   };
 
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+    setIsDeleting(true);
+    try {
+      await removeItem(itemToDelete.id, 'saved_dupes');
+      setItemToDelete(null);
+    } catch (err) {
+      console.error("Delete failed", err);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const generateAndSaveAvatar = async (uid: string, name: string) => {
     setIsGeneratingAvatar(true);
     try {
@@ -174,7 +189,7 @@ const Profile: React.FC<ProfileProps> = ({ onClose, onSearchAgain }) => {
     return [...savedItems].sort((a, b) => {
       if (savedSort === 'name') return a.name.localeCompare(b.name);
       if (savedSort === 'brand') return a.brand.localeCompare(b.brand);
-      if (savedSort === 'score') return b.similarityScore - a.similarityScore;
+      if (savedSort === 'score') return (b.similarityScore || 0) - (a.similarityScore || 0);
       
       const dateA = a.createdAt instanceof Timestamp ? a.createdAt.toDate() : new Date(a.createdAt);
       const dateB = b.createdAt instanceof Timestamp ? b.createdAt.toDate() : new Date(b.createdAt);
@@ -205,6 +220,64 @@ const Profile: React.FC<ProfileProps> = ({ onClose, onSearchAgain }) => {
       exit={{ opacity: 0, x: 50 }}
       className="fixed inset-y-0 right-0 w-full sm:max-w-md bg-black/95 z-[100] border-l border-white/10 backdrop-blur-2xl shadow-[-20px_0_40px_rgba(0,0,0,0.5)] flex flex-col"
     >
+      {/* Confirmation Dialog Overlay */}
+      <AnimatePresence>
+        {itemToDelete && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[110] flex items-center justify-center p-6"
+          >
+            <div 
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+              onClick={() => !isDeleting && setItemToDelete(null)}
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="relative w-full max-w-[320px] liquid-glass-strong p-8 rounded-3xl border border-white/20 bg-black/40 shadow-2xl overflow-hidden"
+            >
+              {/* Background Glow */}
+              <div className="absolute -top-10 -right-10 w-32 h-32 bg-red-500/20 rounded-full blur-[60px]" />
+              
+              <div className="relative z-10 flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-2xl bg-red-500/10 flex items-center justify-center border border-red-500/20 mb-6">
+                  <AlertTriangle className="text-red-400" size={24} />
+                </div>
+                
+                <h3 className="text-xl font-black text-white uppercase tracking-tight mb-2">Remove from Vault?</h3>
+                <p className="text-white/40 text-xs font-medium leading-relaxed mb-8">
+                  Are you sure you want to delete <span className="text-white">"{itemToDelete.name}"</span>? This action cannot be reversed.
+                </p>
+                
+                <div className="flex flex-col w-full gap-3">
+                  <button
+                    disabled={isDeleting}
+                    onClick={confirmDelete}
+                    className="w-full py-4 bg-red-500 hover:bg-red-400 disabled:opacity-50 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-xl transition-all shadow-lg shadow-red-500/20 flex items-center justify-center gap-2"
+                  >
+                    {isDeleting ? (
+                      <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <>Delete Entry</>
+                    )}
+                  </button>
+                  <button
+                    disabled={isDeleting}
+                    onClick={() => setItemToDelete(null)}
+                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-white/60 font-black text-[10px] uppercase tracking-[0.2em] rounded-xl transition-all border border-white/5"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <div className="p-8 border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -396,12 +469,12 @@ const Profile: React.FC<ProfileProps> = ({ onClose, onSearchAgain }) => {
                           <div className="text-white/60 text-[10px] font-bold uppercase tracking-widest">{item.brand}</div>
                         </div>
                         <button 
-                          onClick={() => removeItem(item.id, 'saved_dupes')}
+                          onClick={() => setItemToDelete({ id: item.id, name: item.name })}
                           className="p-2 opacity-0 group-hover:opacity-100 transition-opacity text-white/20 hover:text-red-400"
                         >
-                          <LogOut size={14} className="rotate-180" />
+                          <Trash2 size={14} />
                         </button>
-                        <div className="text-yellow-400 font-black text-xs">{item.similarityScore}% Match</div>
+                        <div className="text-yellow-400 font-black text-xs">{Math.round(item.similarityScore || 0)}% Match</div>
                       </div>
                       <div className="text-white/40 text-[9px] font-black uppercase tracking-widest mt-2 pt-2 border-t border-white/5">
                         {item.price} • Clone of {item.originalPerfume}

@@ -215,7 +215,7 @@ const ResultCard: React.FC<ResultCardProps> = ({
                 transition={{ delay: index * 0.2 + 0.5, type: 'spring', stiffness: 100 }}
                 className="font-heading italic text-4xl md:text-6xl leading-none font-black text-white"
               >
-                {Math.round(perfume.similarityScore)}
+                {Math.round(perfume.similarityScore || 0)}
               </motion.span>
               <span className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] opacity-60 mt-1">PERCENT</span>
               
@@ -376,15 +376,15 @@ const ResultCard: React.FC<ResultCardProps> = ({
           if (lowerPlatform.includes('website') && perfume.productUrl) return null;
 
           const baseSearch = `${perfume.brand} ${perfume.name}`;
-          const marketplaceSearch = encodeURIComponent(`${baseSearch} ${perfume.volume || ''} perfume`);
-          const googleSearch = encodeURIComponent(`${baseSearch} perfume buy online India original`);
+          const marketplaceSearch = encodeURIComponent(`${baseSearch} ${perfume.volume || ''} perfume original buy online India`);
+          const googleSearch = encodeURIComponent(`${baseSearch} ${perfume.volume || ''} price in India original`);
 
           let url = `https://www.google.com/search?q=${googleSearch}`;
           
           if (lowerPlatform.includes('amazon')) {
-            url = `https://www.amazon.in/s?k=${marketplaceSearch}`;
+            url = `https://www.amazon.in/s?k=${marketplaceSearch}&i=beauty&ref=nb_sb_noss`;
           } else if (lowerPlatform.includes('flipkart')) {
-            url = `https://www.flipkart.com/search?q=${marketplaceSearch}`;
+            url = `https://www.flipkart.com/search?q=${marketplaceSearch}&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off`;
           } else if (lowerPlatform.includes('meesho')) {
             url = `https://www.meesho.com/search?q=${marketplaceSearch}`;
           }

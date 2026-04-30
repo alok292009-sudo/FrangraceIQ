@@ -75,6 +75,19 @@ export function useFragranceSearch() {
 
       const parsed = parseResponse(raw);
       
+      // Data Normalization: Ensure scores are valid numbers and other fields have fallbacks
+      if (parsed && parsed.recommendations) {
+        parsed.recommendations = parsed.recommendations.map((perfume: any) => ({
+          ...perfume,
+          similarityScore: typeof perfume.similarityScore === 'number' && !isNaN(perfume.similarityScore)
+            ? Math.max(0, Math.min(100, perfume.similarityScore)) 
+            : 0,
+          whatMatches: perfume.whatMatches || [],
+          whatDoesNot: perfume.whatDoesNot || [],
+          availableOn: perfume.availableOn || []
+        }));
+      }
+
       if (!parsed) {
         throw new Error("PARSE_FAIL");
       }

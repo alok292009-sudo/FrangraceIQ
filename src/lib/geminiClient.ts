@@ -187,7 +187,10 @@ export async function callGemini(perfumeName: string, budget: string = "₹300")
   - Search Reddit (r/DesiFragranceAddicts), YouTube enthusiasts, and IG reels for the absolute best UNDERRATED dupes that mainstream users miss.
   - Prioritize note-based accuracy over brand name.
   
-  STRICT BUDGET RULES:
+  CRITICAL LINK & PRODUCT RULES:
+  - You MUST try to provide a direct "productUrl" if you are confident in it.
+  - For Indian brands like Bella Vita, Denver, Wild Stone, Heavenduft, Westside, Zara (India), etc., provide the most direct link possible.
+  - If a direct link is unknown, leave "productUrl" empty.
   - suggest EXACT products (spray or attar) that cost less than ${budget}.
   
   PRODUCT NAMING REQUIREMENT (CRITICAL):
