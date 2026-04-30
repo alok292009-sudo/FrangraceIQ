@@ -43,7 +43,7 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
   if (status === 'idle') return null;
 
   return (
-    <section className="w-full bg-black py-20 px-6 lg:px-16" id="results">
+    <section className="w-full bg-black py-16 md:py-20 px-4 md:px-16" id="results">
       <div className="max-w-4xl mx-auto">
         <AnimatePresence mode="wait">
           {status === 'loading' && (
@@ -59,7 +59,7 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
                 <motion.p 
                   animate={{ opacity: [0.4, 1, 0.4] }}
                   transition={{ duration: 1.5, repeat: Infinity, repeatType: 'reverse' }}
-                  className="text-white font-heading italic text-xl text-center"
+                  className="text-white font-heading italic text-lg md:text-xl text-center"
                 >
                   <LoadingMessage />
                 </motion.p>
@@ -70,9 +70,9 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
                 </div>
               </div>
               {[1, 2, 3].map((i) => (
-                <div key={i} className="liquid-glass rounded-2xl p-8 animate-pulse border border-white/5">
-                  <div className="bg-white/10 h-8 w-48 rounded-md mb-4" />
-                  <div className="bg-white/5 h-4 w-32 rounded-md mb-10" />
+                <div key={i} className="liquid-glass rounded-2xl p-6 md:p-8 animate-pulse border border-white/5">
+                  <div className="bg-white/10 h-8 w-40 md:w-48 rounded-md mb-4" />
+                  <div className="bg-white/5 h-4 w-24 md:w-32 rounded-md mb-10" />
                   <div className="flex flex-col gap-4">
                     <div className="bg-white/5 h-4 w-full rounded-md" />
                     <div className="bg-white/5 h-4 w-4/5 rounded-md" />
@@ -89,17 +89,17 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, y: -20 }}
-              className="liquid-glass rounded-3xl p-12 border-2 border-red-500/20 bg-red-500/5 flex flex-col items-center text-center gap-6 shadow-[0_0_50px_rgba(239,68,68,0.1)] backdrop-blur-2xl"
+              className="liquid-glass rounded-3xl p-8 md:p-12 border-2 border-red-500/20 bg-red-500/5 flex flex-col items-center text-center gap-6 shadow-[0_0_50px_rgba(239,68,68,0.1)] backdrop-blur-2xl"
             >
               <motion.div
                 animate={{ rotate: [0, -10, 10, -10, 0] }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
-                <AlertCircle size={80} className="text-red-400" />
+                <AlertCircle size={64} className="text-red-400 md:size-[80px]" />
               </motion.div>
               <div className="flex flex-col gap-4">
-                <h3 className="text-3xl font-heading italic text-white drop-shadow-md">Something went wrong</h3>
-                <p className="text-white font-bold text-base max-w-sm leading-relaxed opacity-90">
+                <h3 className="text-2xl md:text-3xl font-heading italic text-white drop-shadow-md">Something went wrong</h3>
+                <p className="text-white font-bold text-sm md:text-base max-w-sm leading-relaxed opacity-90 px-2">
                   {error === 'RATE_LIMIT' 
                     ? "Too many searches. Please wait 60 seconds." 
                     : error === 'PARSE_FAIL' 
@@ -116,13 +116,13 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
 
               {/* Budget options on retry */}
               <div className="flex flex-col items-center gap-6 mt-6">
-                <span className="text-white font-black text-[11px] uppercase tracking-[0.4em] opacity-60">Adjust Budget</span>
-                <div className="flex flex-wrap justify-center gap-3 p-2 liquid-glass rounded-2xl border border-white/10 shadow-inner">
+                <span className="text-white font-black text-[10px] md:text-[11px] uppercase tracking-[0.3em] md:tracking-[0.4em] opacity-60">Adjust Budget</span>
+                <div className="flex flex-wrap justify-center gap-2 p-1.5 liquid-glass rounded-2xl border border-white/10 shadow-inner">
                   {['₹150', '₹300', '₹500', '₹1000'].map((opt) => (
                     <button
                       key={opt}
                       onClick={() => search(lastQuery, opt)}
-                      className={`px-6 py-2.5 rounded-xl text-xs transition-all duration-300 font-black ${
+                      className={`px-5 md:px-6 py-2 md:py-2.5 rounded-xl text-xs transition-all duration-300 font-black ${
                         lastBudget === opt 
                         ? 'bg-white text-black shadow-2xl scale-105' 
                         : 'text-white/70 hover:text-white hover:bg-white/10'
@@ -136,7 +136,7 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
 
               <button 
                 onClick={() => search(lastQuery, lastBudget)}
-                className="bg-white text-black rounded-xl px-12 py-5 text-sm font-black hover:scale-110 active:scale-95 transition-all shadow-2xl mt-6 border-b-4 border-black/10"
+                className="bg-white text-black rounded-xl px-10 md:px-12 py-4 md:py-5 text-sm font-black hover:scale-110 active:scale-95 transition-all shadow-2xl mt-6 border-b-4 border-black/10"
               >
                 Try Again
               </button>
@@ -149,13 +149,13 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8 }}
-              className="flex flex-col gap-14"
+              className="flex flex-col gap-10 md:gap-14"
             >
               <div className="text-center mb-4">
                 <motion.span 
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 0.6, y: 0 }}
-                  className="text-white text-[11px] font-black uppercase tracking-[0.4em] block mb-3"
+                  className="text-white text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] md:tracking-[0.4em] block mb-3"
                 >
                   Results for
                 </motion.span>
@@ -163,7 +163,7 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
                   initial={{ opacity: 0, filter: 'blur(10px)' }}
                   animate={{ opacity: 1, filter: 'blur(0px)' }}
                   transition={{ duration: 0.8, delay: 0.2 }}
-                  className="text-5xl md:text-6xl lg:text-7xl font-heading italic text-white leading-tight drop-shadow-2xl"
+                  className="text-4xl md:text-6xl lg:text-7xl font-heading italic text-white leading-tight drop-shadow-2xl"
                 >
                   {data.originalPerfume}
                 </motion.h2>
@@ -173,19 +173,19 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="mt-10 flex flex-col items-center gap-4"
+                  className="mt-8 md:mt-10 flex flex-col items-center gap-4"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="h-px w-8 bg-white/20" />
-                    <span className="text-white/40 text-[9px] font-black uppercase tracking-[0.4em]">Refine Budget Range</span>
-                    <div className="h-px w-8 bg-white/20" />
+                    <div className="h-px w-6 md:w-8 bg-white/20" />
+                    <span className="text-white/40 text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em] md:tracking-[0.4em]">Refine Budget Range</span>
+                    <div className="h-px w-6 md:w-8 bg-white/20" />
                   </div>
-                  <div className="flex flex-wrap justify-center gap-2.5 p-2 liquid-glass rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl">
+                  <div className="flex flex-wrap justify-center gap-2 p-2 liquid-glass rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl">
                     {['₹150', '₹300', '₹500', '₹1000', '₹2000'].map((opt) => (
                       <button
                         key={opt}
                         onClick={() => search(lastQuery, opt)}
-                        className={`px-6 py-3 rounded-xl text-[11px] transition-all duration-300 font-black tracking-wider ${
+                        className={`px-5 md:px-6 py-2.5 md:py-3 rounded-xl text-[10px] md:text-[11px] transition-all duration-300 font-black tracking-wider ${
                           lastBudget === opt 
                           ? 'bg-white text-black shadow-[0_15px_40px_rgba(255,255,255,0.2)] scale-105' 
                           : 'text-white/60 hover:text-white hover:bg-white/5'
@@ -261,18 +261,18 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                className="mt-16 p-12 liquid-glass rounded-[3rem] border-2 border-white/10 text-center flex flex-col items-center gap-8 shadow-[0_0_100px_rgba(255,255,255,0.05)] backdrop-blur-3xl"
+                className="mt-16 p-8 md:p-12 liquid-glass rounded-[2rem] md:rounded-[3rem] border-2 border-white/10 text-center flex flex-col items-center gap-8 shadow-[0_0_100px_rgba(255,255,255,0.05)] backdrop-blur-3xl"
               >
                  <div className="flex items-center gap-6">
-                    <div className="h-[1px] w-12 bg-white/30"></div>
-                    <h4 className="text-white text-xs font-black uppercase tracking-[0.5em]">REALITY VERDICT</h4>
-                    <div className="h-[1px] w-12 bg-white/30"></div>
+                    <div className="h-[1px] w-8 md:w-12 bg-white/30"></div>
+                    <h4 className="text-white text-[10px] md:text-xs font-black uppercase tracking-[0.3em] md:tracking-[0.5em]">REALITY VERDICT</h4>
+                    <div className="h-[1px] w-8 md:w-12 bg-white/30"></div>
                  </div>
-                 <p className="text-white font-body font-black text-2xl md:text-3xl leading-relaxed italic max-w-2xl drop-shadow-lg">
+                 <p className="text-white font-body font-black text-2xl md:text-4xl leading-relaxed italic max-w-3xl drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)] px-2">
                    "{data.realityVerdict}"
                  </p>
-                 <div className="h-px w-full max-w-sm bg-white/20" />
-                 <p className="text-white font-bold text-lg leading-relaxed max-w-xl opacity-90">
+                 <div className="h-px w-full max-w-xs md:max-w-md bg-white/30" />
+                 <p className="text-white font-black text-base md:text-xl leading-relaxed max-w-2xl drop-shadow-md px-4">
                    {data.budgetAdvice}
                  </p>
               </motion.div>

@@ -130,13 +130,20 @@ export async function callGemini(perfumeName: string, budget: string = "₹300")
   - suggest EXACT products (spray or attar) that cost less than ${budget}.
   - prioritize brands from our expanded 100+ brand list (Arabian Aroma, Vokka, Scentedelic, Ababel, Lattafa, Maison Alhambra, Heavenduft, XLNC, Indinoir, etc.).
   
+  PRODUCT NAMING REQUIREMENT:
+  - You MUST use the REAL name the dupe brand has given the product. 
+  - DO NOT write "Inspired by [Designer]" or "[Designer] Version". 
+  - Example: If searching for Sauvage, for Denver suggest "Hamilton", for Al Rehab suggest "Officer", for Armaf suggest "Ventana". 
+  - Using the designer name as the product name is a failure. Find the specific dupe name.
+  
   BRAND VARIETY REQUIREMENT:
   - DO NOT suggest the same brand twice for the same search if other high-quality options exist.
   - DO NOT suggest Muzna.
   - Show a VAST range of brands (e.g., suggest one niche clone house, one mass-market outlier, and one attar/Middle Eastern gem).
   
-  NO WIDE RANGES:
-  - You MUST specify the EXACT price for the volume that fits the budget. For example, if a brand has a 10ml for ₹150 and 100ml for ₹1000, and budget is ₹300, you MUST list the 10ml for ₹150. DO NOT write ₹150-₹1000.
+  NOTE-BASED MATCHING:
+  - Do not just find "clones". Compare the DNA. If the user asks for a vanilla scent, look for dupes with high-quality Madagascar vanilla or ethyl vanillin notes.
+  - Eliminate brands that are known to be "alcohol bombs" even if they are popular.
   
   DIRECT BUYING REQUIREMENT:
   - You MUST try to find the direct product URL on the brand's website (e.g., arabianaroma.com, vokkafragrances.com, projectalternative.com, heavenduft.com).

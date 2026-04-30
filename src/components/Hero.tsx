@@ -90,7 +90,7 @@ export default function Hero({ search, status }: HeroProps) {
 
         <BlurText
           text="Find Your Perfect Dupe."
-          className="text-6xl md:text-7xl lg:text-[5.8rem] font-heading italic text-white leading-[0.85] tracking-[-3px] mb-8"
+          className="text-5xl md:text-7xl lg:text-[5.8rem] font-heading italic text-white leading-tight md:leading-[0.85] tracking-tight md:tracking-[-3px] mb-8 drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
           delay={100}
         />
 
@@ -98,31 +98,31 @@ export default function Hero({ search, status }: HeroProps) {
           initial={{ opacity: 0, filter: 'blur(10px)', y: 20 }}
           animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
           transition={{ duration: 0.8, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="text-white font-body font-medium text-base md:text-lg max-w-xl leading-relaxed mb-8 drop-shadow-sm"
+          className="text-white font-body font-bold text-base md:text-xl max-w-xl leading-relaxed mb-8 drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)] px-4"
         >
           Enter any luxury perfume. AI decodes its scent DNA and finds the closest Indian market matches within your budget.
         </motion.p>
 
         {/* Search Bar & Budget */}
-        <div className="w-full max-w-2xl flex flex-col gap-6">
+        <div className="w-full max-w-2xl flex flex-col gap-6 px-4">
           <motion.form
             onSubmit={handleSubmit}
             initial={{ opacity: 0, filter: 'blur(10px)', y: 20 }}
             animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
             transition={{ duration: 0.8, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
-            className="liquid-glass-strong rounded-full p-2 flex items-center gap-2 w-full shadow-2xl"
+            className="liquid-glass-strong rounded-3xl md:rounded-full p-2 flex flex-col md:flex-row items-center gap-2 w-full shadow-2xl"
           >
             <input
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Try 'Dior Sauvage' or 'Creed Aventus'..."
-              className="flex-1 bg-transparent text-white placeholder-white/60 text-sm md:text-base font-semibold outline-none px-6"
+              className="flex-1 bg-transparent text-white placeholder-white/80 text-sm md:text-base font-bold outline-none px-6 py-3 w-full"
             />
             <button
               type="submit"
               disabled={status === 'loading'}
-              className="bg-white text-black rounded-full px-8 py-3 text-sm font-bold flex items-center gap-1.5 transition-all hover:bg-white/90 active:scale-95 disabled:opacity-50"
+              className="bg-white text-black rounded-2xl md:rounded-full w-full md:w-auto px-8 py-3.5 text-sm font-bold flex items-center justify-center gap-1.5 transition-all hover:bg-white/90 active:scale-95 disabled:opacity-50"
             >
               {status === 'loading' ? 'Searching...' : 'Find Dupe'}
               <ArrowUpRight size={16} strokeWidth={2.5} />
