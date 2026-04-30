@@ -103,9 +103,9 @@ export async function callGemini(perfumeName: string, budget: string = "₹300")
   const prompt = `Find the best Indian market dupes (prioritize underrated/niche hidden gems) under ${budget} for: ${perfumeName}\n\n${FRAGRANCE_SYSTEM_PROMPT}`;
 
   try {
-    // Start with gemini-2.0-flash as it's the current flagship
+    // Primary model: gemini-3-flash-preview is recommended for basic text tasks and generally has good availability
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-3-flash-preview",
       contents: prompt,
       config: {
         temperature: 0.3,
@@ -126,8 +126,12 @@ export async function callGemini(perfumeName: string, budget: string = "₹300")
     if (isRateLimit || isNotFound) {
       console.log(`Primary model failed (${isRateLimit ? '429' : '404'}), starting fallback sequence...`);
       
-      // Fallback order: 1.5-flash (stable) -> 1.5-pro (higher capacity if flash is slammed) -> flash-8b (lightweight)
-      const fallbackModels = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-1.5-flash-8b"];
+      // Fallback order: follow skill recommendations (flash-latest -> 3.1-pro -> 3.1-flash-lite)
+      const fallbackModels = [
+        "gemini-flash-latest",
+        "gemini-3.1-pro-preview",
+        "gemini-3.1-flash-lite-preview"
+      ];
       
       for (const modelId of fallbackModels) {
         try {
