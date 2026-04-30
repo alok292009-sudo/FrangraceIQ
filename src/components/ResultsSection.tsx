@@ -117,6 +117,32 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
               ))}
             </div>
 
+            {/* Price Range Refinement after Success */}
+            <div className="mt-8 flex flex-col items-center gap-6 py-12 border-t border-white/5">
+                <div className="flex flex-col items-center gap-2">
+                  <span className="text-white/30 text-[10px] uppercase tracking-widest">Not what you're looking for?</span>
+                  <p className="text-white/50 text-xs text-center max-w-xs">
+                    Try refining your budget. Higher budgets often unlock long-lasting niche dupe houses.
+                  </p>
+                </div>
+                
+                <div className="flex gap-2 p-1.5 liquid-glass rounded-xl">
+                  {['₹150', '₹300', '₹500', '₹1000', '₹2000'].map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => search(lastQuery, opt)}
+                      className={`px-6 py-2 rounded-lg text-xs transition-all duration-300 font-body ${
+                        lastBudget === opt 
+                        ? 'bg-white text-black font-semibold shadow-[0_0_20px_rgba(255,255,255,0.3)]' 
+                        : 'text-white/40 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+            </div>
+
             <div className="mt-16 p-8 liquid-glass rounded-2xl border border-white/5 text-center flex flex-col items-center gap-4">
                <h4 className="text-white/60 text-xs font-semibold uppercase tracking-widest">REALITY VERDICT</h4>
                <p className="text-white/80 font-body font-light text-base leading-relaxed italic">

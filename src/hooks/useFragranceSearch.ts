@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { callGemini } from "../lib/geminiClient";
 import { parseResponse } from "../lib/responseParser";
 
@@ -13,14 +13,21 @@ export function useFragranceSearch() {
   const [error, setError] = useState<string | null>(null);
   const [lastQuery, setLastQuery] = useState<string>("");
   const [lastBudget, setLastBudget] = useState<string>("₹300");
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const search = async (perfumeName: string, budget: string = "₹300") => {
-    if (!perfumeName.trim() || status === "loading") return;
+    if (!perfumeName.trim()) return;
+    
+    // Abort previous search if it's still running
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
     
     const cacheKey = `${perfumeName.toLowerCase()}-${budget}`;
     setLastQuery(perfumeName);
     setLastBudget(budget);
 
+    // Speed up with cache
     if (searchHistoryCache[cacheKey]) {
       setData(searchHistoryCache[cacheKey]);
       setStatus("success");
@@ -32,8 +39,17 @@ export function useFragranceSearch() {
     setData(null);
     setError(null);
 
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
+      // In this specific implementation, callGemini doesn't support signal directly 
+      // but we handle the state update check below
       const raw = await callGemini(perfumeName, budget);
+      
+      // If the request was aborted, don't update state
+      if (controller.signal.aborted) return;
+
       const parsed = parseResponse(raw);
       
       if (!parsed) {
@@ -44,6 +60,8 @@ export function useFragranceSearch() {
       setData(parsed);
       setStatus("success");
     } catch (e: any) {
+      if (controller.signal.aborted) return;
+      
       console.error("Search Error:", e);
       if (e.message === "RATE_LIMIT") {
         setError("RATE_LIMIT");
@@ -59,6 +77,10 @@ export function useFragranceSearch() {
         setError("DEFAULT");
       }
       setStatus("error");
+    } finally {
+      if (abortControllerRef.current === controller) {
+        abortControllerRef.current = null;
+      }
     }
   };
 

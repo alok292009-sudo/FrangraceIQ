@@ -72,7 +72,8 @@ No markdown. No explanation. No preamble. Pure JSON only.
       "brand": "string",
       "type": "attar | spray | roll-on",
       "priceRange": "₹XXX–₹XXX",
-      "availableOn": ["Amazon", "Flipkart", "Meesho"],
+      "availableOn": ["Amazon", "Flipkart", "Meesho", "Website"],
+      "productUrl": "string | null (Direct link if known/stable, otherwise null)",
       "similarityScore": 72,
       "whatMatches": ["string", "string"],
       "whatDoesNot": ["string", "string"],
@@ -91,7 +92,10 @@ No markdown. No explanation. No preamble. Pure JSON only.
 `;
 
 export async function callGemini(perfumeName: string, budget: string = "₹300") {
-  const apiKey = process.env.GEMINI_API_KEY;
+  // Try to find the API key in various typical locations
+  const apiKey = process.env.GEMINI_API_KEY || 
+                 (import.meta as any).env?.VITE_GEMINI_API_KEY ||
+                 (import.meta as any).env?.GEMINI_API_KEY;
   
   if (!apiKey || apiKey === "your_actual_key_here") {
     console.error("Gemini API Key is missing. Please check your AI Studio secrets.");

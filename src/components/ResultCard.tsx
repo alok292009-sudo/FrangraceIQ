@@ -10,6 +10,7 @@ interface Recommendation {
   type: string;
   priceRange: string;
   availableOn: string[];
+  productUrl?: string | null;
   similarityScore: number;
   whatMatches: string[];
   whatDoesNot: string[];
@@ -143,17 +144,21 @@ const ResultCard: React.FC<ResultCardProps> = ({
       {/* Buy Buttons */}
       <div className="mt-8 flex flex-wrap gap-3">
         {perfume.availableOn.map((platform) => {
-          const searchTerm = encodeURIComponent(`${perfume.name} ${perfume.brand} perfume`);
-          let url = '#';
+          const cleanPlatform = platform.trim();
+          const searchTerm = encodeURIComponent(`${perfume.name} ${perfume.brand} perfume India`);
           
-          if (platform.toLowerCase().includes('amazon')) {
-            url = `https://www.amazon.in/s?k=${searchTerm}`;
-          } else if (platform.toLowerCase().includes('flipkart')) {
-            url = `https://www.flipkart.com/search?q=${searchTerm}`;
-          } else if (platform.toLowerCase().includes('meesho')) {
-            url = `https://www.meesho.com/search?q=${searchTerm}`;
-          } else {
-            url = `https://www.google.com/search?q=${searchTerm}`;
+          // Enhanced deep linking logic: Use productUrl if available for ANY platform, 
+          // otherwise fallback to specific search URLs
+          let url = perfume.productUrl || `https://www.google.com/search?q=${searchTerm}`;
+          
+          if (!perfume.productUrl) {
+            if (cleanPlatform.toLowerCase().includes('amazon')) {
+              url = `https://www.amazon.in/s?k=${searchTerm}`;
+            } else if (cleanPlatform.toLowerCase().includes('flipkart')) {
+              url = `https://www.flipkart.com/search?q=${searchTerm}`;
+            } else if (cleanPlatform.toLowerCase().includes('meesho')) {
+              url = `https://www.meesho.com/search?q=${searchTerm}`;
+            }
           }
 
           return (
@@ -162,13 +167,36 @@ const ResultCard: React.FC<ResultCardProps> = ({
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="liquid-glass-strong rounded-lg px-5 py-2.5 text-xs text-white hover:scale-105 transition-transform flex items-center gap-2"
+              className="liquid-glass-strong rounded-lg px-5 py-2.5 text-xs text-white hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer z-20 relative"
+              onClick={(e) => e.stopPropagation()}
             >
-              {platform}
+              <span className="font-medium">{cleanPlatform}</span>
               <ExternalLink size={12} className="opacity-60" />
             </a>
           );
         })}
+      </div>
+
+      {/* Review Links */}
+      <div className="mt-4 flex flex-wrap gap-3">
+        <a 
+          href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${perfume.name} ${perfume.brand} perfume review India`)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[10px] text-white/40 hover:text-white/80 transition-colors flex items-center gap-1.5"
+        >
+          <span>Watch Reviews on YouTube</span>
+          <ExternalLink size={10} />
+        </a>
+        <a 
+          href={`https://www.google.com/search?q=${encodeURIComponent(`site:reddit.com ${perfume.name} ${perfume.brand} perfume review`)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[10px] text-white/40 hover:text-white/80 transition-colors flex items-center gap-1.5"
+        >
+          <span>Check Reddit Discussions</span>
+          <ExternalLink size={10} />
+        </a>
       </div>
 
       {/* Tips */}
