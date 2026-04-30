@@ -1,8 +1,34 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import ResultCard from './ResultCard';
+
+const loadingMessages = [
+  "Decoding scent DNA...",
+  "Scanning r/DesiFragranceAddicts...",
+  "Searching YouTube (Joy Amin & others)...",
+  "Checking Instagram reviews...",
+  "Scanning Muzna & Scentrix inventory...",
+  "Calculating similarity scores...",
+  "Eliminating synthetic alcohol bombs...",
+  "Finding hidden budget gems...",
+  "Cross-referencing longevity claims...",
+  "Validating market availability..."
+];
+
+const LoadingMessage = () => {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((current) => (current + 1) % loadingMessages.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return <span>{loadingMessages[index]}</span>;
+};
 
 interface ResultsSectionProps {
   status: 'idle' | 'loading' | 'success' | 'error';
@@ -29,13 +55,20 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="flex flex-col gap-8"
             >
-              <motion.p 
-                animate={{ opacity: [0.4, 0.8, 0.4] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="text-white/40 font-body italic text-sm text-center mb-6"
-              >
-                Decoding scent DNA...
-              </motion.p>
+              <div className="flex flex-col items-center gap-2 mb-6">
+                <motion.p 
+                  animate={{ opacity: [0.4, 1, 0.4] }}
+                  transition={{ duration: 1.5, repeat: Infinity, repeatType: 'reverse' }}
+                  className="text-white font-heading italic text-xl text-center"
+                >
+                  <LoadingMessage />
+                </motion.p>
+                <div className="flex gap-1">
+                  <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="w-1 h-1 rounded-full bg-white/40" />
+                  <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1 h-1 rounded-full bg-white/40" />
+                  <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1 h-1 rounded-full bg-white/40" />
+                </div>
+              </div>
               {[1, 2, 3].map((i) => (
                 <div key={i} className="liquid-glass rounded-2xl p-8 animate-pulse border border-white/5">
                   <div className="bg-white/10 h-8 w-48 rounded-md mb-4" />
@@ -118,7 +151,7 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
               transition={{ duration: 0.8 }}
               className="flex flex-col gap-14"
             >
-              <div className="text-center mb-10">
+              <div className="text-center mb-4">
                 <motion.span 
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 0.6, y: 0 }}
@@ -134,12 +167,38 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
                 >
                   {data.originalPerfume}
                 </motion.h2>
+                
+                {/* Immediate Budget Refinement */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="mt-8 flex flex-col items-center gap-4"
+                >
+                  <span className="text-white/40 text-[9px] font-bold uppercase tracking-[0.3em]">Refine Budget Range</span>
+                  <div className="flex flex-wrap justify-center gap-2 p-1.5 liquid-glass rounded-2xl border border-white/5 backdrop-blur-md">
+                    {['₹150', '₹300', '₹500', '₹1000', '₹2000'].map((opt) => (
+                      <button
+                        key={opt}
+                        onClick={() => search(lastQuery, opt)}
+                        className={`px-5 py-2 rounded-xl text-[10px] transition-all duration-300 font-bold ${
+                          lastBudget === opt 
+                          ? 'bg-white text-black shadow-lg scale-105' 
+                          : 'text-white/60 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+
                 {data.recommendations.length === 0 && (
                   <motion.p 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="text-white font-bold italic mt-8 text-lg"
+                    className="text-white font-bold italic mt-12 text-lg"
                   >
                     No budget clones found that meet our quality ceiling.
                   </motion.p>

@@ -179,10 +179,16 @@ const ResultCard: React.FC<ResultCardProps> = ({
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white text-black rounded-lg px-8 py-4 text-sm font-black hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer z-20 relative shadow-[0_15px_30px_rgba(255,255,255,0.2)] border-2 border-white/30"
+              className={`rounded-lg px-8 py-4 text-sm font-black transition-all flex items-center gap-2 cursor-pointer z-20 relative shadow-2xl border-2 hover:scale-105 active:scale-95 ${
+                lowerPlatform.includes('website') || lowerPlatform.includes('official')
+                  ? 'bg-yellow-400 text-black border-yellow-500/50 shadow-yellow-400/20'
+                  : 'bg-white text-black border-white/30'
+              }`}
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="font-black uppercase tracking-tight">{cleanPlatform}</span>
+              <span className="font-black uppercase tracking-tight">
+                {lowerPlatform.includes('website') ? 'Visit Official Store' : `Buy on ${cleanPlatform}`}
+              </span>
               <ExternalLink size={14} strokeWidth={3} />
             </a>
           );
