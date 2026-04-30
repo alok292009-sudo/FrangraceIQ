@@ -103,6 +103,7 @@ export async function callGemini(perfumeName: string, budget: string = "₹300")
   const prompt = `Find the best Indian market dupes (prioritize underrated/niche hidden gems) under ${budget} for: ${perfumeName}\n\n${FRAGRANCE_SYSTEM_PROMPT}`;
 
   try {
+    // Start with gemini-2.0-flash as it's the current flagship
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
       contents: prompt,
@@ -113,50 +114,49 @@ export async function callGemini(perfumeName: string, budget: string = "₹300")
     });
 
     const text = response.text;
-
-    if (!text) {
-      throw new Error("EMPTY_RESPONSE");
-    }
-
+    if (!text) throw new Error("EMPTY_RESPONSE");
     return text;
   } catch (error: any) {
-    console.error("Gemini SDK Error:", error);
+    console.error("Gemini SDK Primary Error:", error);
     
     const errorMessage = error.message || String(error);
     const isRateLimit = errorMessage.includes("429") || errorMessage.includes("RATE_LIMIT") || errorMessage.includes("RESOURCE_EXHAUSTED");
     const isNotFound = errorMessage.includes("404") || errorMessage.includes("not found");
     
     if (isRateLimit || isNotFound) {
-      console.log(`Primary model failed (${isRateLimit ? '429' : '404'}), attempting fallback to gemini-1.5-flash...`);
-      try {
-        const fallback1 = await ai.models.generateContent({
-          model: "gemini-1.5-flash",
-          contents: prompt,
-          config: {
-            temperature: 0.3,
-            responseMimeType: "application/json",
-          }
-        });
-        return fallback1.text || "";
-      } catch (e1: any) {
-        console.error("First fallback failed, trying gemini-1.5-flash-8b...", e1);
+      console.log(`Primary model failed (${isRateLimit ? '429' : '404'}), starting fallback sequence...`);
+      
+      // Fallback order: 1.5-flash (stable) -> 1.5-pro (higher capacity if flash is slammed) -> flash-8b (lightweight)
+      const fallbackModels = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-1.5-flash-8b"];
+      
+      for (const modelId of fallbackModels) {
         try {
-          const fallback2 = await ai.models.generateContent({
-            model: "gemini-1.5-flash-8b",
+          console.log(`Attempting fallback with model: ${modelId}`);
+          const fallbackResponse = await ai.models.generateContent({
+            model: modelId,
             contents: prompt,
             config: {
               temperature: 0.3,
               responseMimeType: "application/json",
             }
           });
-          return fallback2.text || "";
-        } catch (e2) {
-          if (isRateLimit) {
-            throw new Error("RATE_LIMIT");
+          
+          if (fallbackResponse.text) {
+            console.log(`Fallback successful with ${modelId}`);
+            return fallbackResponse.text;
           }
-          throw new Error("SEARCH_ERROR: The fragrance intelligence service is currently experiencing extremely high demand. Please try again in 60 seconds.");
+        } catch (fallbackError: any) {
+          console.error(`Fallback to ${modelId} failed:`, fallbackError);
+          // Continue to next model if this one also fails
+          continue;
         }
       }
+      
+      // If everything failed
+      if (isRateLimit) {
+        throw new Error("RATE_LIMIT");
+      }
+      throw new Error("SEARCH_ERROR: Our fragrance experts are currently overwhelmed by too many requests. Please try again in 30 seconds.");
     }
 
     if (errorMessage.includes("403") || errorMessage.includes("permission denied") || errorMessage.includes("API key")) {
