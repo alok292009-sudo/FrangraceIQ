@@ -91,11 +91,8 @@ No markdown. No explanation. No preamble. Pure JSON only.
 `;
 
 export async function callGemini(perfumeName: string, budget: string = "₹300") {
-  // Most compatible way for Vite to handle env vars across different platforms
-  const metaEnv = (import.meta as any).env || {};
-  const apiKey = metaEnv.VITE_GEMINI_API_KEY || 
-                 metaEnv.GEMINI_API_KEY ||
-                 process.env.GEMINI_API_KEY;
+  // Use process.env directly for Gemini API key as recommended by the skill
+  const apiKey = process.env.GEMINI_API_KEY;
   
   if (!apiKey || apiKey === "your_actual_key_here") {
     console.error("Gemini API Key is missing. Please check your AI Studio secrets.");
@@ -106,10 +103,9 @@ export async function callGemini(perfumeName: string, budget: string = "₹300")
   const prompt = `Find the best Indian market dupes (prioritize underrated/niche hidden gems) under ${budget} for: ${perfumeName}\n\n${FRAGRANCE_SYSTEM_PROMPT}`;
 
   try {
-    // Using gemini-1.5-flash for maximum stability and regional availability
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
-      contents: [{ parts: [{ text: prompt }] }],
+      model: "gemini-2.0-flash",
+      contents: prompt,
       config: {
         temperature: 0.3,
         responseMimeType: "application/json",
@@ -126,15 +122,41 @@ export async function callGemini(perfumeName: string, budget: string = "₹300")
   } catch (error: any) {
     console.error("Gemini SDK Error:", error);
     
-    // Check for specific error types to provide better feedback
     const errorMessage = error.message || String(error);
+    const isRateLimit = errorMessage.includes("429") || errorMessage.includes("RATE_LIMIT") || errorMessage.includes("RESOURCE_EXHAUSTED");
+    const isNotFound = errorMessage.includes("404") || errorMessage.includes("not found");
     
-    if (errorMessage.includes("429") || errorMessage.includes("RATE_LIMIT")) {
-      throw new Error("RATE_LIMIT");
-    }
-    
-    if (errorMessage.includes("404") || errorMessage.includes("not found")) {
-      throw new Error("SEARCH_ERROR: The fragrance model is currently unavailable in your region.");
+    if (isRateLimit || isNotFound) {
+      console.log(`Primary model failed (${isRateLimit ? '429' : '404'}), attempting fallback to gemini-1.5-flash...`);
+      try {
+        const fallback1 = await ai.models.generateContent({
+          model: "gemini-1.5-flash",
+          contents: prompt,
+          config: {
+            temperature: 0.3,
+            responseMimeType: "application/json",
+          }
+        });
+        return fallback1.text || "";
+      } catch (e1: any) {
+        console.error("First fallback failed, trying gemini-1.5-flash-8b...", e1);
+        try {
+          const fallback2 = await ai.models.generateContent({
+            model: "gemini-1.5-flash-8b",
+            contents: prompt,
+            config: {
+              temperature: 0.3,
+              responseMimeType: "application/json",
+            }
+          });
+          return fallback2.text || "";
+        } catch (e2) {
+          if (isRateLimit) {
+            throw new Error("RATE_LIMIT");
+          }
+          throw new Error("SEARCH_ERROR: The fragrance intelligence service is currently experiencing extremely high demand. Please try again in 60 seconds.");
+        }
+      }
     }
 
     if (errorMessage.includes("403") || errorMessage.includes("permission denied") || errorMessage.includes("API key")) {
