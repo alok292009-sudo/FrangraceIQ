@@ -13,7 +13,7 @@ import Testimonials from './components/Testimonials';
 import CtaFooter from './components/CtaFooter';
 import Profile from './components/Profile';
 import { useFragranceSearch } from './hooks/useFragranceSearch';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence } from 'framer-motion';
 
 export default function App() {
   const { status, data, error, lastQuery, lastBudget, search } = useFragranceSearch();

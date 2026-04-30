@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, ExternalLink, Star, Bookmark, BookmarkCheck, Loader2, Copy, ClipboardCheck } from 'lucide-react';
 import ScentDNAAccordion from './ScentDNAAccordion';
 import RatingSystem from './RatingSystem';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { auth, db, OperationType, handleFirestoreError, signInWithGoogle } from '../lib/firebase';
 import { collection, addDoc, query, where, getDocs, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { onAuthStateChanged, User } from 'firebase/auth';
@@ -154,60 +154,91 @@ const ResultCard: React.FC<ResultCardProps> = ({
       <div className={`absolute -top-20 -right-20 w-40 h-40 rounded-full blur-[100px] opacity-10 ${perfume.similarityScore >= 90 ? 'bg-green-400' : 'bg-white'}`} />
 
       {/* Top Row */}
-      <div className="flex flex-col md:flex-row justify-between items-start gap-6 relative z-10">
+      <div className="flex flex-col md:flex-row justify-between items-start gap-8 relative z-10">
         <div className="flex flex-col">
-          <h3 className="font-heading italic text-3xl md:text-5xl text-white leading-tight drop-shadow-md">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="h-[1px] w-10 bg-yellow-400"></span>
+            <span className="text-yellow-400 text-[9px] font-black uppercase tracking-[0.4em]">Match Discovery</span>
+          </div>
+          <h3 className="font-heading italic text-5xl md:text-7xl lg:text-8xl text-white leading-[0.8] drop-shadow-2xl mb-4">
             {perfume.name}
           </h3>
-          <span className="text-white text-base md:text-lg font-body font-black mt-1 drop-shadow-sm">by {perfume.brand}</span>
-          <div className="inline-block mt-4">
-            <span className="liquid-glass rounded-lg px-4 py-2 text-[10px] md:text-xs font-black uppercase tracking-widest text-white bg-white/30 border-2 border-white/40 shadow-lg">
+          <div className="flex items-center gap-3">
+             <span className="text-white/40 text-lg md:text-xl font-heading italic">by</span>
+             <span className="text-white text-2xl md:text-3xl font-black uppercase tracking-tighter">{perfume.brand}</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2.5 mt-8">
+            <div className="bg-white/5 backdrop-blur-xl rounded-full px-5 py-2 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-white/80 border border-white/10 shadow-xl">
               {perfume.type}
-            </span>
+            </div>
+            {perfume.similarityScore >= 90 && (
+              <div className="bg-green-500/10 backdrop-blur-xl rounded-full px-5 py-2 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-green-400 border border-green-500/20 shadow-[0_0_30px_rgba(34,197,94,0.15)] flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+                Highly Accurate
+              </div>
+            )}
           </div>
         </div>
 
-          <div className="flex flex-row md:flex-col items-center gap-4 self-center md:self-auto">
+          <div className="flex flex-row md:flex-col items-center gap-6 self-center md:self-auto">
             {/* Save Button */}
-            <button
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={handleSaveToggle}
               disabled={isSaving}
-              className={`p-3 rounded-full border transition-all duration-300 ${
+              className={`p-4 rounded-2xl border transition-all duration-500 ${
                 isSaved 
-                  ? 'bg-yellow-400 border-yellow-400 text-black shadow-[0_0_15px_rgba(250,204,21,0.4)]' 
-                  : 'bg-white/5 border-white/10 text-white/40 hover:text-white hover:border-white/40'
+                  ? 'bg-yellow-400 border-yellow-400 text-black shadow-[0_20px_40px_rgba(250,204,21,0.3)]' 
+                  : 'bg-white/5 border-white/10 text-white/40 hover:text-white hover:border-white/40 hover:bg-white/10 shadow-xl'
               }`}
             >
               {isSaving ? (
-                <Loader2 size={20} className="animate-spin" />
+                <Loader2 size={24} className="animate-spin text-white" />
               ) : isSaved ? (
-                <BookmarkCheck size={20} />
+                <BookmarkCheck size={24} strokeWidth={2.5} />
               ) : (
-                <Bookmark size={20} />
+                <Bookmark size={24} strokeWidth={2.5} />
               )}
-            </button>
+            </motion.button>
 
-            <div className={`w-[90px] h-[90px] md:w-[110px] md:h-[110px] rounded-full border-[3px] flex flex-col items-center justify-center shadow-2xl backdrop-blur-md transition-all duration-700 ${scoreClass}`}>
-            <motion.span 
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.2 + 0.5, type: 'spring' }}
-              className="font-heading italic text-3xl md:text-4xl leading-none font-bold"
-            >
-              {Math.round(perfume.similarityScore)}%
-            </motion.span>
-            <span className="text-[10px] md:text-[12px] font-black uppercase tracking-tight opacity-80">match</span>
-            
-            {/* Inner Ring Glow */}
-            <div className={`absolute inset-0 rounded-full border-2 border-white/10 ${perfume.similarityScore >= 90 ? 'animate-pulse' : ''}`} />
+            <div className={`relative group w-[100px] h-[100px] md:w-[130px] md:h-[130px] rounded-full border-[4px] flex flex-col items-center justify-center shadow-2xl backdrop-blur-md transition-all duration-1000 ${scoreClass}`}>
+              <motion.div
+                initial={{ rotate: -180, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                transition={{ duration: 1.5, ease: "circOut", delay: index * 0.2 }}
+                className="absolute inset-[-6px] rounded-full border border-white/10"
+              />
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.2 + 0.5, type: 'spring', stiffness: 100 }}
+                className="font-heading italic text-4xl md:text-6xl leading-none font-black text-white"
+              >
+                {Math.round(perfume.similarityScore)}
+              </motion.span>
+              <span className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] opacity-60 mt-1">PERCENT</span>
+              
+              {/* Inner Glow Effect */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/10 to-transparent opacity-50" />
+            </div>
           </div>
         </div>
-      </div>
 
       {/* Price & Volume */}
-      <div className="mt-8 flex items-baseline gap-3">
-        <span className="text-yellow-400 font-heading italic text-3xl md:text-5xl drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] filter brightness-125">{perfume.price}</span>
-        <span className="text-white/70 font-black uppercase text-sm md:text-base tracking-widest drop-shadow-sm">{perfume.volume}</span>
+      <div className="mt-12 flex items-center justify-between border-y border-white/5 py-6">
+        <div className="flex flex-col">
+          <span className="text-white/30 text-[9px] font-black uppercase tracking-[0.3em] mb-2">Estimated Indian Price</span>
+          <div className="flex items-baseline gap-3">
+            <span className="text-yellow-400 font-heading italic text-5xl md:text-7xl leading-none drop-shadow-2xl">{perfume.price}</span>
+            <span className="text-white/50 font-black uppercase text-xs md:text-sm tracking-[0.2em]">{perfume.volume}</span>
+          </div>
+        </div>
+        
+        <div className="flex flex-col items-end">
+          <span className="text-white/30 text-[9px] font-black uppercase tracking-[0.3em] mb-2">Scent Profile</span>
+          <span className="text-white font-black text-sm md:text-base uppercase tracking-tighter text-right">{fragranceFamily}</span>
+        </div>
       </div>
 
       {/* Scent DNA Accordion */}
@@ -227,7 +258,7 @@ const ResultCard: React.FC<ResultCardProps> = ({
             WHAT MATCHES
           </h4>
           <ul className="flex flex-col gap-3">
-            {perfume.whatMatches.map((item, idx) => (
+            {(perfume.whatMatches || []).map((item, idx) => (
               <li key={idx} className="flex items-start gap-3 bg-white/10 p-4 rounded-xl border border-white/10 shadow-lg backdrop-blur-sm">
                 <CheckCircle size={18} className="text-green-400 shrink-0 mt-0.5 filter drop-shadow-[0_0_5px_rgba(74,222,128,0.3)]" />
                 <span className="text-white text-sm md:text-base font-body font-black leading-relaxed">{item}</span>
@@ -241,7 +272,7 @@ const ResultCard: React.FC<ResultCardProps> = ({
             WHAT DOESN'T
           </h4>
           <ul className="flex flex-col gap-3">
-            {perfume.whatDoesNot.map((item, idx) => (
+            {(perfume.whatDoesNot || []).map((item, idx) => (
               <li key={idx} className="flex items-start gap-3 bg-white/10 p-4 rounded-xl border border-white/10 shadow-lg backdrop-blur-sm">
                 <XCircle size={18} className="text-red-400 shrink-0 mt-0.5 filter drop-shadow-[0_0_5px_rgba(248,113,113,0.3)]" />
                 <span className="text-white text-sm md:text-base font-body font-black leading-relaxed">{item}</span>
@@ -252,16 +283,19 @@ const ResultCard: React.FC<ResultCardProps> = ({
       </div>
 
       {/* Performance Badges */}
-      <div className="mt-10 flex flex-wrap gap-3">
+      <div className="mt-12 flex flex-wrap gap-4 items-center justify-center">
         {[
           { label: 'Longevity', value: perfume.longevity, icon: '⏱' },
           { label: 'Projection', value: perfume.projection, icon: '📡' },
           { label: 'Best For', value: perfume.bestFor, icon: '✦' },
           { label: 'Season', value: perfume.season, icon: '🌤' }
         ].map((badge, idx) => (
-          <div key={idx} className="liquid-glass rounded-xl px-5 py-3 text-[12px] md:text-sm text-white font-black bg-white/20 border-2 border-white/10 shadow-xl backdrop-blur-xl hover:scale-105 transition-transform duration-300">
-             <span className="mr-2 text-base">{badge.icon}</span>
-             <span className="tracking-tight">{badge.value}</span>
+          <div key={idx} className="group relative">
+            <div className="liquid-glass rounded-2xl px-6 py-4 flex flex-col items-center gap-1.5 transition-all duration-500 hover:scale-110 hover:-translate-y-1 bg-white/5 border border-white/10 shadow-2xl backdrop-blur-3xl min-w-[120px]">
+              <span className="text-2xl mb-1">{badge.icon}</span>
+              <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/40">{badge.label}</span>
+              <span className="text-sm font-black text-white tracking-tight uppercase">{badge.value}</span>
+            </div>
           </div>
         ))}
       </div>
@@ -335,7 +369,7 @@ const ResultCard: React.FC<ResultCardProps> = ({
         )}
 
         {/* Platform Buttons */}
-        {perfume.availableOn.filter(p => p.trim() !== "").map((platform) => {
+        {(perfume.availableOn || []).filter(p => p && p.trim() !== "").map((platform) => {
           const cleanPlatform = platform.trim();
           const lowerPlatform = cleanPlatform.toLowerCase();
           

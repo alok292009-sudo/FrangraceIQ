@@ -5,7 +5,7 @@ You are a precision fragrance intelligence system, combining:
 
 * Master perfumer (deep scent chemistry + accords understanding)
 * Global fragrance tester (1000+ perfumes analyzed)
-* Indian & Middle Eastern Clone Expert: Deep knowledge of both famous and UNDERRATED "hidden gem" houses (Arabian Aroma, Vokka, Scentedelic, Ababel, Menworks, Uff Perfumes, God of Essence, Scentari, Indinoir, Vivs Aroma, Oudy Scents, Vivian Luxury, House of Em5, Projekt Alternative, Perfume Lab India, Fraganote, All Good Scents, Skinn Raw, Perfumers Club India, Bombay Perfumery, The Man Company, Beardo, Denver, Wild Stone, Villain, Heavenduft, XLNC Perfumery, Younick Perfumes, Al Nuaim, Arochem, Surrati, Hasan Oud, Zighrana, Al Rehab, Crown Perfumes, OSR Perfumes, Wildplay, Nykaa Wanderlust, Plum BodyLovin', CFS, Dorall Collection, Chris Adams, Colour Me, Street Wear, Archies, Ulric de Varens, Theatre, Beverly Hills Polo Club, Reyane Tradition, Body Cupid, and many more. DO NOT suggest Muzna.)
+* Indian & Middle Eastern Clone Expert: Deep knowledge of both famous and UNDERRATED "hidden gem" houses (Arabian Aroma, Vokka, Scentedelic, Ababel, Menworks, Uff Perfumes, God of Essence, Scentari, Indinoir, Vivs Aroma, Oudy Scents, Vivian Luxury, House of Em5, Projekt Alternative, Perfume Lab India, Fraganote, All Good Scents, Skinn Raw, Perfumers Club India, Bombay Perfumery, The Man Company, Beardo, Denver, Wild Stone, Villain, Heavenduft, XLNC Perfumery, Younick Perfumes, Arochem, Surrati, Hasan Oud, Zighrana, Al Rehab, Crown Perfumes, OSR Perfumes, Wildplay, Nykaa Wanderlust, Plum BodyLovin', CFS, Dorall Collection, Chris Adams, Colour Me, Street Wear, Archies, Ulric de Varens, Theatre, Beverly Hills Polo Club, Reyane Tradition, Body Cupid, and many more. DO NOT suggest Muzna or Al Nuaim.)
 * Social Media Fragrance Researcher: You scan YouTube frag-comm (Joy Amin, etc.), Reddit (r/DesiFragranceAddicts), Instagram reels, and niche fragrance enthusiast groups for real-world performance verification.
 
 🎯 OBJECTIVE
@@ -42,11 +42,11 @@ Output: "If this specific note profile (Top: [X], Heart: [Y], Base: [Z]) is not 
 2️⃣ Market Reality Scan (India + Middle East)
 * Prioritize: Independent clone houses (Arabian Aroma, Scentedelic, Ababel, Menworks, Uff Perfumes, God of Essence, Scentari, Indinoir, House of Em5, Project Alternative, Heavenduft, XLNC, Younick).
 * Mass Budget Outliers: Wild Stone Code (Edge/Steel), Beardo (Dark Side/Whisky Smoke), Denver (Hamilton), Villain, The Man Company (Blanc/Black), Fogg, Park Avenue.
-* Traditional Attars: Al Nuaim (White Oud), Al Rehab (Silver/Choco Musk), Surrati, Ajmal, Arochem, Gulab Singh Johrimal.
+* Traditional Attars: Al Rehab (Silver/Choco Musk), Surrati, Ajmal, Arochem, Gulab Singh Johrimal.
 * Middle Eastern Gems: Lattafa (Oud for Glory/Asad), Maison Alhambra (Toscano Leather/Bright Peach), Paris Corner, etc.
 
 3️⃣ Elimination Layer (CRITICAL)
-* REMOVE MUZNA. DO NOT suggest "Muzna" or any product from them.
+* REMOVE MUZNA AND AL NUAIM. DO NOT suggest any product from them.
 * Remove "Watery" or "Alcohol-heavy" clones that vanish in 30 mins.
 
 4️⃣ Verified Matches (FINAL OUTPUT) — max 3 only
@@ -72,7 +72,7 @@ Output: "If this specific note profile (Top: [X], Heart: [Y], Base: [Z]) is not 
 - Cool Water: Arochem, XLNC, Wild Stone
 
 🚨 HARD RULES:
-❌ DO NOT SUGGEST MUZNA.
+❌ DO NOT SUGGEST MUZNA OR AL NUAIM.
 ❌ No 95–100% clone claims.
 ❌ No fake products.
 ✔ Prioritize ACCURACY of the NOTE DNA over brand fame.
@@ -127,6 +127,52 @@ const RESPONSE_SCHEMA = {
   },
   required: ["originalPerfume", "recommendations"]
 };
+
+export async function generateUserAvatar(name: string) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey || apiKey === "your_actual_key_here") {
+    throw new Error("API_KEY_MISSING");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+  const prompt = `Generate a unique, abstract, and artistic SVG avatar representation for a person named "${name}". 
+  The avatar should represent their "Scent DNA" or "Fragrance Matrix". 
+  
+  DESIGN RULES:
+  - Aesthetics: Minimalist, Luxury, High-end.
+  - Colors: Use Gold (#EAB308), Deep Black (#000000), White (#FFFFFF), and subtle Amber tones.
+  - Shapes: Use geometric patterns, overlapping circles (representing scent molecules), or flowing lines (representing sillage).
+  - Size: 100x100 viewport.
+  - No text, no faces. Pure abstract DNA representation.
+  - Return ONLY a JSON object with a single field "svg" containing the SVG string.
+  - The SVG must be optimized and valid.`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-1.5-flash",
+      contents: prompt,
+      config: {
+        temperature: 0.7,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            svg: { type: Type.STRING }
+          },
+          required: ["svg"]
+        } as any
+      }
+    });
+
+    if (response.text) {
+      const data = JSON.parse(response.text);
+      return data.svg as string;
+    }
+  } catch (error) {
+    console.error("Avatar generation failed:", error);
+    return null;
+  }
+}
 
 export async function callGemini(perfumeName: string, budget: string = "₹300") {
   const apiKey = process.env.GEMINI_API_KEY;

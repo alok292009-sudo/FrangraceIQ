@@ -85,5 +85,13 @@ service cloud.firestore {
       allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow update: if false;
     }
+
+    // Users Collection
+    match /users/{userId} {
+      allow get: if isSignedIn(); // Allow authenticated users to view profiles (could be restricted to owner if needed)
+      allow list: if false; // List is generally dangerous for users
+      allow create, update: if isSignedIn() && request.auth.uid == userId;
+      allow delete: if false;
+    }
   }
 }

@@ -1,7 +1,7 @@
 
 import HlsVideo from './HlsVideo';
 import { Zap, Palette, BarChart3 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 export default function HowItWorks() {
   const steps = [
@@ -47,24 +47,32 @@ export default function HowItWorks() {
           Enter any designer fragrance. AI breaks down its exact scent DNA and finds the closest real Indian market match under ₹300.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 w-full max-w-6xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 w-full max-w-6xl mt-10">
           {steps.map((step, idx) => (
             <motion.div
               key={idx}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: idx * 0.2 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, delay: idx * 0.2, ease: "circOut" }}
               viewport={{ once: true }}
-              className="liquid-glass rounded-[2.5rem] p-12 flex flex-col items-center text-center gap-8 group hover:bg-white/10 transition-all border-2 border-white/10 shadow-2xl backdrop-blur-xl"
+              className="liquid-glass rounded-[3rem] p-12 flex flex-col items-center text-center gap-10 group hover:bg-white/5 hover:border-white/20 transition-all border border-white/10 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.6)] relative overflow-hidden"
             >
-              <div className="bg-white text-black rounded-full w-16 h-16 flex items-center justify-center shrink-0 shadow-[0_0_30px_rgba(255,255,255,0.3)]">
-                <step.icon size={28} strokeWidth={2.5} />
+              {/* Glass Reflection */}
+              <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+              
+              <div className="bg-white text-black rounded-2xl w-20 h-20 flex items-center justify-center shrink-0 shadow-[0_20px_40px_rgba(255,255,255,0.2)] rotate-3 group-hover:rotate-0 transition-all duration-500">
+                <step.icon size={36} strokeWidth={2.5} />
               </div>
-              <div className="flex flex-col gap-5">
-                <h4 className="text-3xl font-heading italic text-white leading-tight drop-shadow-sm">{step.title}</h4>
-                <p className="text-white font-body font-bold text-sm leading-relaxed opacity-90">
+              <div className="flex flex-col gap-6">
+                <h4 className="text-4xl font-heading italic text-white leading-tight drop-shadow-2xl">{step.title}</h4>
+                <p className="text-white/60 font-body font-bold text-base leading-relaxed tracking-tight group-hover:text-white/90 transition-colors">
                   {step.description}
                 </p>
+              </div>
+
+              {/* Step Number */}
+              <div className="absolute -bottom-4 -right-4 text-[100px] font-heading italic text-white/5 pointer-events-none font-black leading-none">
+                0{idx + 1}
               </div>
             </motion.div>
           ))}

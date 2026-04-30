@@ -41,9 +41,22 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["name", "brand", "originalPerfume", "userId", "createdAt"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Extended user profile information including custom AI-generated avatars.",
+      "type": "object",
+      "properties": {
+        "customAvatar": { "type": "string", "description": "SVG string of the abstract avatar" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
     }
   },
   "firestore": {
+    "users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles and custom metadata"
+    },
     "ratings/{ratingId}": {
       "schema": "Rating",
       "description": "Collection of dupe ratings"

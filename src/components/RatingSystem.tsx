@@ -3,7 +3,7 @@ import { Star, LogIn, Check } from 'lucide-react';
 import { auth, db, signInWithGoogle, OperationType, handleFirestoreError } from '../lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface RatingSystemProps {
   targetPerfume: string;

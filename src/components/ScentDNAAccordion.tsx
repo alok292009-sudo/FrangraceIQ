@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 
 interface ScentDNAAccordionProps {
@@ -21,16 +21,26 @@ export default function ScentDNAAccordion({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="mt-5 liquid-glass rounded-lg overflow-hidden">
+    <div className="mt-6 liquid-glass rounded-2xl overflow-hidden border border-white/10 group">
       <div 
         onClick={() => setIsOpen(!isOpen)}
-        className="p-5 flex justify-between items-center cursor-pointer hover:bg-white/10 transition-colors bg-white/5 border-b border-white/5"
+        className="p-6 flex justify-between items-center cursor-pointer hover:bg-white/10 transition-all duration-500 bg-white/5"
       >
-        <span className="text-white text-sm font-bold uppercase tracking-widest">Scent DNA</span>
-        <ChevronDown 
-          size={18} 
-          className={`text-white transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} 
-        />
+        <div className="flex items-center gap-4">
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-500 ${isOpen ? 'bg-yellow-400 text-black rotate-0' : 'bg-white/10 text-white/40 rotate-45 group-hover:rotate-0'}`}>
+            <span className="text-[10px] font-black uppercase">DNA</span>
+          </div>
+          <span className="text-white text-[11px] font-black uppercase tracking-[0.3em]">Scent Matrix Decoded</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-white/20 text-[9px] font-black uppercase tracking-widest hidden md:block">
+            {isOpen ? 'Close Report' : 'View Detailed Breakdown'}
+          </span>
+          <ChevronDown 
+            size={18} 
+            className={`text-white transition-transform duration-500 ${isOpen ? 'rotate-180' : ''}`} 
+          />
+        </div>
       </div>
 
       <AnimatePresence>
@@ -39,52 +49,67 @@ export default function ScentDNAAccordion({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="p-6 pt-0 bg-white/5">
-              <div className="text-white text-[12px] md:text-[14px] font-black uppercase tracking-[0.3em] mb-3 mt-6 drop-shadow-sm">Family</div>
-              <div className="text-white font-heading italic text-3xl md:text-4xl mb-4 drop-shadow-xl">{fragranceFamily}</div>
+            <div className="p-8 pt-4 bg-white/[0.02] border-t border-white/5 backdrop-blur-3xl">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div>
+                  <div className="text-white/20 text-[10px] font-black uppercase tracking-[0.5em] mb-4">Core Identity</div>
+                  <div className="text-white font-heading italic text-4xl md:text-5xl mb-8 drop-shadow-2xl leading-none">
+                    {fragranceFamily}
+                  </div>
 
-              <div className="text-white text-[12px] md:text-[14px] font-black uppercase tracking-[0.3em] mb-4 drop-shadow-sm">Main Accords</div>
-              <div className="flex flex-wrap gap-2.5 mb-8">
-                {dominantAccords.map((accord, idx) => (
-                  <span key={idx} className="liquid-glass rounded-xl px-5 py-2.5 text-xs md:text-sm text-white font-black bg-white/20 border-2 border-white/30 shadow-xl backdrop-blur-md">
-                    {accord}
-                  </span>
-                ))}
+                  <div className="text-white/20 text-[10px] font-black uppercase tracking-[0.5em] mb-6">Main Accords</div>
+                  <div className="flex flex-wrap gap-2.5">
+                    {(dominantAccords || []).map((accord, idx) => (
+                      <span key={idx} className="liquid-glass rounded-xl px-5 py-3 text-[10px] md:text-xs text-white font-black bg-white/5 border border-white/10 shadow-xl hover:bg-white/10 hover:border-yellow-400/30 transition-all cursor-default">
+                        {accord}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-8">
+                  <div>
+                    <div className="text-white/20 text-[10px] font-black uppercase tracking-[0.5em] mb-6">Evolution: Opening</div>
+                    <ul className="flex flex-col gap-4">
+                      {(openingNotes || []).map((note, idx) => (
+                        <li key={idx} className="text-white/90 text-sm md:text-base font-bold leading-relaxed flex items-center gap-4 group/note">
+                          <div className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover/note:bg-yellow-400 transition-colors shadow-[0_0_8px_rgba(255,255,255,0.1)] shrink-0 group-hover/note:shadow-yellow-400/50" />
+                          <span className="group-hover/note:translate-x-1 transition-transform">{note}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <div className="text-white/20 text-[10px] font-black uppercase tracking-[0.5em] mb-6">Evolution: Dry-down</div>
+                    <ul className="flex flex-col gap-4">
+                      {(drydownNotes || []).map((note, idx) => (
+                        <li key={idx} className="text-white/90 text-sm md:text-base font-bold leading-relaxed flex items-center gap-4 group/note">
+                          <div className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover/note:bg-yellow-400 transition-colors shadow-[0_0_8px_rgba(255,255,255,0.1)] shrink-0 group-hover/note:shadow-yellow-400/50" />
+                          <span className="group-hover/note:translate-x-1 transition-transform">{note}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-8 mb-8">
-                <div>
-                  <div className="text-white text-[12px] md:text-[14px] font-black uppercase tracking-[0.3em] mb-4 drop-shadow-sm">Opening</div>
-                  <ul className="flex flex-col gap-3">
-                    {openingNotes.map((note, idx) => (
-                      <li key={idx} className="text-white text-sm md:text-base font-black leading-relaxed flex items-center gap-3 drop-shadow-md">
-                        <span className="w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.5)] shrink-0"></span>
-                        {note}
-                      </li>
-                    ))}
-                  </ul>
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="mt-12 p-8 rounded-[2rem] bg-gradient-to-br from-yellow-400/10 to-orange-500/10 border border-yellow-400/20 shadow-2xl backdrop-blur-3xl relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <div className="text-yellow-400 text-[10px] font-black uppercase tracking-[0.5em] mb-5 drop-shadow-xl flex items-center gap-3">
+                  <div className="h-0.5 w-8 bg-yellow-400" />
+                  Primary Driver
                 </div>
-                <div>
-                  <div className="text-white text-[12px] md:text-[14px] font-black uppercase tracking-[0.3em] mb-4 drop-shadow-sm">Dry-down</div>
-                  <ul className="flex flex-col gap-3">
-                    {drydownNotes.map((note, idx) => (
-                      <li key={idx} className="text-white text-sm md:text-base font-black leading-relaxed flex items-center gap-3 drop-shadow-md">
-                        <span className="w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.5)] shrink-0"></span>
-                        {note}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="p-6 md:p-8 rounded-2xl bg-yellow-400/20 border-2 border-yellow-400/50 shadow-[0_0_40px_rgba(250,204,21,0.1)] backdrop-blur-3xl">
-                <div className="text-yellow-400 text-[12px] md:text-[14px] font-black uppercase tracking-[0.3em] mb-4 drop-shadow-xl">Key Note Driver</div>
-                <p className="text-yellow-50 font-black text-base md:text-xl leading-relaxed drop-shadow-lg">
+                <p className="text-white font-heading italic text-2xl md:text-4xl leading-[1.1] drop-shadow-lg max-w-4xl">
                   {keyDrivers}
                 </p>
-              </div>
+              </motion.div>
             </div>
           </motion.div>
         )}

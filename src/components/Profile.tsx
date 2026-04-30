@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db, OperationType, handleFirestoreError } from '../lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { collection, query, where, getDocs, orderBy, limit, Timestamp, deleteDoc, doc } from 'firebase/firestore';
-import { motion, AnimatePresence } from 'motion/react';
-import { History, Star, User as UserIcon, LogOut, Clock, ChevronRight, Bookmark, ArrowUpDown } from 'lucide-react';
+import { collection, query, where, getDocs, orderBy, limit, Timestamp, deleteDoc, doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { motion, AnimatePresence } from 'framer-motion';
+import { History, Star, User as UserIcon, LogOut, Clock, ChevronRight, Bookmark, ArrowUpDown, Sparkles } from 'lucide-react';
+import { generateUserAvatar } from '../lib/geminiClient';
 
 interface PastSearch {
   id: string;
@@ -44,6 +45,8 @@ const Profile: React.FC<ProfileProps> = ({ onClose, onSearchAgain }) => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'history' | 'ratings' | 'saved'>('history');
   const [savedSort, setSavedSort] = useState<'date' | 'name' | 'brand' | 'score'>('date');
+  const [customAvatar, setCustomAvatar] = useState<string | null>(null);
+  const [isGeneratingAvatar, setIsGeneratingAvatar] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
@@ -58,6 +61,23 @@ const Profile: React.FC<ProfileProps> = ({ onClose, onSearchAgain }) => {
   const fetchUserData = async (uid: string) => {
     setLoading(true);
     try {
+      // Fetch custom avatar
+      const userDocRef = doc(db, 'users', uid);
+      const userDoc = await getDoc(userDocRef).catch(err => {
+        handleFirestoreError(err, OperationType.GET, `users/${uid}`);
+        return null;
+      });
+      if (userDoc?.exists()) {
+        const data = userDoc.data();
+        if (data.customAvatar) {
+          setCustomAvatar(data.customAvatar);
+        } else if (!user?.photoURL) {
+          generateAndSaveAvatar(uid, user?.displayName || 'User');
+        }
+      } else if (!user?.photoURL) {
+        generateAndSaveAvatar(uid, user?.displayName || 'User');
+      }
+
       // Fetch searches
       const searchPath = 'searches';
       const searchSnap = await getDocs(query(
@@ -124,6 +144,26 @@ const Profile: React.FC<ProfileProps> = ({ onClose, onSearchAgain }) => {
     }
   };
 
+  const generateAndSaveAvatar = async (uid: string, name: string) => {
+    setIsGeneratingAvatar(true);
+    try {
+      const svg = await generateUserAvatar(name);
+      if (svg) {
+        setCustomAvatar(svg);
+        await setDoc(doc(db, 'users', uid), { 
+          customAvatar: svg,
+          updatedAt: serverTimestamp() 
+        }, { merge: true }).catch(err => {
+          handleFirestoreError(err, OperationType.WRITE, `users/${uid}`);
+        });
+      }
+    } catch (error) {
+      console.error("Failed to generate avatar", error);
+    } finally {
+      setIsGeneratingAvatar(false);
+    }
+  };
+
   const formatDate = (ts: any) => {
     if (!ts) return '';
     const date = ts instanceof Timestamp ? ts.toDate() : new Date(ts);
@@ -168,18 +208,38 @@ const Profile: React.FC<ProfileProps> = ({ onClose, onSearchAgain }) => {
       {/* Header */}
       <div className="p-8 border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          {user.photoURL ? (
-            <img src={user.photoURL} alt={user.displayName || ''} className="w-12 h-12 rounded-full border border-white/20 shadow-lg" />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
-              <UserIcon className="text-white" />
-            </div>
-          )}
+          <div className="relative group/avatar">
+            {user.photoURL ? (
+              <img src={user.photoURL} alt={user.displayName || ''} className="w-16 h-16 rounded-full border border-white/20 shadow-lg" />
+            ) : customAvatar ? (
+              <div 
+                className="w-16 h-16 rounded-full border border-yellow-400/30 shadow-[0_0_20px_rgba(234,179,8,0.2)] bg-black overflow-hidden"
+                dangerouslySetInnerHTML={{ __html: customAvatar }}
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
+                {isGeneratingAvatar ? (
+                  <Sparkles size={24} className="text-yellow-400 animate-pulse" />
+                ) : (
+                  <UserIcon className="text-white" size={24} />
+                )}
+              </div>
+            )}
+            
+            {!user.photoURL && (
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-black shadow-lg">
+                <Sparkles size={12} className="text-black" />
+              </div>
+            )}
+          </div>
           <div>
-            <h2 className="text-lg font-black text-white leading-tight">{user.displayName}</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-black text-white leading-tight">{user.displayName}</h2>
+              <span className="text-[8px] font-black bg-white/10 text-white/40 px-1.5 py-0.5 rounded uppercase tracking-widest">Scent DNA Verified</span>
+            </div>
             <button 
               onClick={handleLogout}
-              className="text-[9px] font-black uppercase tracking-widest text-white/40 hover:text-red-400 transition-colors flex items-center gap-1"
+              className="text-[9px] font-black uppercase tracking-widest text-white/40 hover:text-red-400 transition-colors flex items-center gap-1 mt-1"
             >
               <LogOut size={10} /> Logout
             </button>
@@ -191,30 +251,51 @@ const Profile: React.FC<ProfileProps> = ({ onClose, onSearchAgain }) => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-white/10 overflow-x-auto scrollbar-hide">
+      <div className="flex border-b border-white/5 px-2 relative">
         <button 
           onClick={() => setActiveTab('history')}
-          className={`flex-1 min-w-[100px] py-4 text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2 ${
-            activeTab === 'history' ? 'text-white border-b-2 border-white' : 'text-white/40'
+          className={`flex-1 py-5 text-[9px] font-black uppercase tracking-[0.25em] transition-all duration-500 relative flex items-center justify-center gap-2 group ${
+            activeTab === 'history' ? 'text-white' : 'text-white/30 hover:text-white/60'
           }`}
         >
-          <History size={14} /> History
+          <History size={13} className={`${activeTab === 'history' ? 'text-yellow-400' : ''}`} />
+          <span className="relative z-10">History</span>
+          {activeTab === 'history' && (
+            <motion.div 
+              layoutId="profile-tab"
+              className="absolute bottom-0 left-4 right-4 h-0.5 bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)]"
+            />
+          )}
         </button>
         <button 
           onClick={() => setActiveTab('saved')}
-          className={`flex-1 min-w-[100px] py-4 text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2 ${
-            activeTab === 'saved' ? 'text-white border-b-2 border-white' : 'text-white/40'
+          className={`flex-1 py-5 text-[9px] font-black uppercase tracking-[0.25em] transition-all duration-500 relative flex items-center justify-center gap-2 group ${
+            activeTab === 'saved' ? 'text-white' : 'text-white/30 hover:text-white/60'
           }`}
         >
-          <Bookmark size={14} /> Saved
+          <Bookmark size={13} className={`${activeTab === 'saved' ? 'text-yellow-400' : ''}`} />
+          <span className="relative z-10">Vault</span>
+          {activeTab === 'saved' && (
+            <motion.div 
+              layoutId="profile-tab"
+              className="absolute bottom-0 left-4 right-4 h-0.5 bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)]"
+            />
+          )}
         </button>
         <button 
           onClick={() => setActiveTab('ratings')}
-          className={`flex-1 min-w-[100px] py-4 text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2 ${
-            activeTab === 'ratings' ? 'text-white border-b-2 border-white' : 'text-white/40'
+          className={`flex-1 py-5 text-[9px] font-black uppercase tracking-[0.25em] transition-all duration-500 relative flex items-center justify-center gap-2 group ${
+            activeTab === 'ratings' ? 'text-white' : 'text-white/30 hover:text-white/60'
           }`}
         >
-          <Star size={14} /> Ratings
+          <Star size={13} className={`${activeTab === 'ratings' ? 'text-yellow-400' : ''}`} />
+          <span className="relative z-10">DNA Feedback</span>
+          {activeTab === 'ratings' && (
+            <motion.div 
+              layoutId="profile-tab"
+              className="absolute bottom-0 left-4 right-4 h-0.5 bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)]"
+            />
+          )}
         </button>
       </div>
 
@@ -247,8 +328,13 @@ const Profile: React.FC<ProfileProps> = ({ onClose, onSearchAgain }) => {
                         <div className="text-[9px] font-black uppercase tracking-widest text-white/40 mb-1 flex items-center gap-1">
                           <Clock size={10} /> {formatDate(s.createdAt)}
                         </div>
-                        <div className="text-white font-black text-sm group-hover:text-yellow-400 transition-colors uppercase tracking-wider">{s.query}</div>
-                        <div className="text-white/60 text-[10px] font-bold">Max {s.budget}</div>
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <div className="text-white font-black text-sm group-hover:text-yellow-400 transition-colors uppercase tracking-wider">{s.query}</div>
+                          <span className="px-1.5 py-0.5 rounded bg-white/5 text-[8px] font-black text-yellow-500 border border-white/10 whitespace-nowrap">
+                            {s.budget}
+                          </span>
+                        </div>
+                        <div className="text-white/30 text-[8px] font-black uppercase tracking-widest">Scent DNA Analysis</div>
                       </div>
                       
                       <button
