@@ -14,7 +14,7 @@ export default function Hero({ search, status }: HeroProps) {
   const [history, setHistory] = useState<string[]>([]);
   const staticSuggestions = ['Dior Sauvage', 'Creed Aventus', 'YSL Black Opium'];
 
-  const budgetOptions = ['₹150', '₹300', '₹500', '₹1000'];
+  const budgetOptions = ['₹150', '₹300', '₹500', '₹1000', '₹2000'];
 
   useEffect(() => {
     const savedHistory = localStorage.getItem('fragrance_search_history');
@@ -136,19 +136,20 @@ export default function Hero({ search, status }: HeroProps) {
             transition={{ duration: 0.8, delay: 1.3, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-col items-center gap-3"
           >
-            <span className="text-white/60 text-[10px] font-bold uppercase tracking-[0.2em] drop-shadow-sm">Select Your Budget</span>
-            <div className="flex gap-2 p-1.5 liquid-glass rounded-full border border-white/10">
+            <span className="text-white/60 text-[10px] font-black uppercase tracking-[0.3em] drop-shadow-sm">Select Price Range</span>
+            <div className="flex flex-wrap justify-center gap-2 p-2 liquid-glass rounded-2xl border border-white/10 shadow-xl">
               {budgetOptions.map((opt) => (
                 <button
                   key={opt}
+                  type="button"
                   onClick={() => setBudget(opt)}
-                  className={`px-5 py-2 rounded-full text-xs transition-all duration-300 ${
+                  className={`px-6 py-2.5 rounded-xl text-xs transition-all duration-300 font-bold ${
                     budget === opt 
-                    ? 'bg-white text-black font-bold shadow-lg' 
-                    : 'text-white hover:text-white hover:bg-white/10 font-medium'
+                    ? 'bg-white text-black shadow-2xl scale-105' 
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
                   }`}
                 >
-                  {opt}
+                  Under {opt}
                 </button>
               ))}
             </div>

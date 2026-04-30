@@ -173,21 +173,25 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="mt-8 flex flex-col items-center gap-4"
+                  className="mt-10 flex flex-col items-center gap-4"
                 >
-                  <span className="text-white/40 text-[9px] font-bold uppercase tracking-[0.3em]">Refine Budget Range</span>
-                  <div className="flex flex-wrap justify-center gap-2 p-1.5 liquid-glass rounded-2xl border border-white/5 backdrop-blur-md">
+                  <div className="flex items-center gap-4">
+                    <div className="h-px w-8 bg-white/20" />
+                    <span className="text-white/40 text-[9px] font-black uppercase tracking-[0.4em]">Refine Budget Range</span>
+                    <div className="h-px w-8 bg-white/20" />
+                  </div>
+                  <div className="flex flex-wrap justify-center gap-2.5 p-2 liquid-glass rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl">
                     {['₹150', '₹300', '₹500', '₹1000', '₹2000'].map((opt) => (
                       <button
                         key={opt}
                         onClick={() => search(lastQuery, opt)}
-                        className={`px-5 py-2 rounded-xl text-[10px] transition-all duration-300 font-bold ${
+                        className={`px-6 py-3 rounded-xl text-[11px] transition-all duration-300 font-black tracking-wider ${
                           lastBudget === opt 
-                          ? 'bg-white text-black shadow-lg scale-105' 
+                          ? 'bg-white text-black shadow-[0_15px_40px_rgba(255,255,255,0.2)] scale-105' 
                           : 'text-white/60 hover:text-white hover:bg-white/5'
                         }`}
                       >
-                        {opt}
+                        UNDER {opt}
                       </button>
                     ))}
                   </div>

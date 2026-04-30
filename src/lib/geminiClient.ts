@@ -24,8 +24,9 @@ Given a perfume name and a budget, your task is to:
 
 1️⃣ Scent Identity (Note-Based Truth)
 * Fragrance family & dominant accords.
-* Key drivers: Break down the specific dry-down notes. Does the clone capture the specific sandalwood nuance or the metallic opening?
-Output: "If this specific note profile is not matched, it's not a real clone."
+    * Key drivers: Break down the specific dry-down notes. Does the clone capture the specific sandalwood nuance, the smoky birch, or the metallic ambroxan opening? 
+    * ACCURACY OVER BRAND: DO NOT just name brands. Compare the actual notes. If a brand is known for a synthetic "alcohol bomb" opening, eliminate it.
+Output: "If this specific note profile (Top: [X], Heart: [Y], Base: [Z]) is not matched, it's not a real clone."
 
 2️⃣ Market Reality Scan (India + Middle East)
 * Prioritize: Independent clone houses (Arabian Aroma, Scentedelic, Ababel, Menworks, Uff Perfumes, God of Essence, Scentari, Indinoir, House of Em5, Project Alternative, Heavenduft, XLNC, Younick).
