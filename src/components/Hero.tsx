@@ -98,7 +98,7 @@ export default function Hero({ search, status }: HeroProps) {
           initial={{ opacity: 0, filter: 'blur(10px)', y: 20 }}
           animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
           transition={{ duration: 0.8, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="text-white font-body font-bold text-base md:text-xl max-w-xl leading-relaxed mb-8 drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)] px-4"
+          className="text-white font-body font-black text-base md:text-xl max-w-xl leading-relaxed mb-8 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] px-4 opacity-100"
         >
           Enter any luxury perfume. AI decodes its scent DNA and finds the closest Indian market matches within your budget.
         </motion.p>
@@ -117,7 +117,7 @@ export default function Hero({ search, status }: HeroProps) {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Try 'Dior Sauvage' or 'Creed Aventus'..."
-              className="flex-1 bg-transparent text-white placeholder-white/80 text-sm md:text-base font-bold outline-none px-6 py-3 w-full"
+              className="flex-1 bg-transparent text-white placeholder-white/90 text-sm md:text-base font-black outline-none px-6 py-3 w-full"
             />
             <button
               type="submit"
@@ -131,22 +131,22 @@ export default function Hero({ search, status }: HeroProps) {
 
           {/* Budget Selector */}
           <motion.div
-            initial={{ opacity: 0, filter: 'blur(10px)', y: 10 }}
+            initial={{ opacity: 0, filter: 'blur(10px)', y: 20 }}
             animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
             transition={{ duration: 0.8, delay: 1.3, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-col items-center gap-3"
           >
-            <span className="text-white/60 text-[10px] font-black uppercase tracking-[0.3em] drop-shadow-sm">Select Price Range</span>
-            <div className="flex flex-wrap justify-center gap-2 p-2 liquid-glass rounded-2xl border border-white/10 shadow-xl">
+            <span className="text-white text-[12px] md:text-[14px] font-black uppercase tracking-[0.3em] drop-shadow-md">Select Price Range</span>
+            <div className="flex flex-wrap justify-center gap-2 p-2 liquid-glass rounded-2xl border border-white/20 shadow-2xl">
               {budgetOptions.map((opt) => (
                 <button
                   key={opt}
                   type="button"
                   onClick={() => setBudget(opt)}
-                  className={`px-6 py-2.5 rounded-xl text-xs transition-all duration-300 font-bold ${
+                  className={`px-6 py-2.5 rounded-xl text-xs md:text-sm transition-all duration-300 font-black ${
                     budget === opt 
                     ? 'bg-white text-black shadow-2xl scale-105' 
-                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   Under {opt}

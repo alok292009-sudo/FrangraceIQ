@@ -238,16 +238,16 @@ const ResultCard: React.FC<ResultCardProps> = ({
       {/* Tips */}
       <div className="mt-10 pt-8 border-t border-white/20 grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <span className="text-white text-[11px] md:text-[13px] font-black uppercase tracking-[0.2em] block mb-3 px-1 opacity-90">Apply here</span>
-          <div className="bg-white/20 rounded-xl p-5 border-2 border-white/20 shadow-xl backdrop-blur-xl">
-            <span className="text-white text-[12px] md:text-sm font-bold leading-relaxed drop-shadow-sm">{applicationTip}</span>
+            <span className="text-white text-[12px] md:text-[14px] font-black uppercase tracking-[0.3em] block mb-3 px-1 drop-shadow-md">Apply here</span>
+          <div className="bg-white/20 rounded-xl p-5 border-2 border-white/30 shadow-2xl backdrop-blur-2xl">
+            <span className="text-white text-[14px] md:text-base font-black leading-relaxed drop-shadow-md">{applicationTip}</span>
           </div>
         </div>
         {layeringTip && (
           <div>
-            <span className="text-white text-[11px] md:text-[13px] font-black uppercase tracking-[0.2em] block mb-3 px-1 opacity-90">Layer with</span>
-            <div className="bg-white/20 rounded-xl p-5 border-2 border-white/20 shadow-xl backdrop-blur-xl">
-              <span className="text-white text-[12px] md:text-sm font-bold leading-relaxed drop-shadow-sm">{layeringTip}</span>
+            <span className="text-white text-[12px] md:text-[14px] font-black uppercase tracking-[0.3em] block mb-3 px-1 drop-shadow-md">Layer with</span>
+            <div className="bg-white/20 rounded-xl p-5 border-2 border-white/30 shadow-2xl backdrop-blur-2xl">
+              <span className="text-white text-[14px] md:text-base font-black leading-relaxed drop-shadow-md">{layeringTip}</span>
             </div>
           </div>
         )}

@@ -154,8 +154,8 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
               <div className="text-center mb-4">
                 <motion.span 
                   initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 0.6, y: 0 }}
-                  className="text-white text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] md:tracking-[0.4em] block mb-3"
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-white text-[12px] md:text-[14px] font-black uppercase tracking-[0.4em] block mb-3 drop-shadow-md"
                 >
                   Results for
                 </motion.span>
@@ -163,7 +163,7 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
                   initial={{ opacity: 0, filter: 'blur(10px)' }}
                   animate={{ opacity: 1, filter: 'blur(0px)' }}
                   transition={{ duration: 0.8, delay: 0.2 }}
-                  className="text-4xl md:text-6xl lg:text-7xl font-heading italic text-white leading-tight drop-shadow-2xl"
+                  className="text-5xl md:text-7xl lg:text-9xl font-heading italic text-white leading-[0.9] drop-shadow-[0_15px_60px_rgba(0,0,0,0.9)] mb-6"
                 >
                   {data.originalPerfume}
                 </motion.h2>
@@ -173,22 +173,22 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="mt-8 md:mt-10 flex flex-col items-center gap-4"
+                  className="mt-12 md:mt-16 flex flex-col items-center gap-8 mb-20"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="h-px w-6 md:w-8 bg-white/20" />
-                    <span className="text-white/40 text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em] md:tracking-[0.4em]">Refine Budget Range</span>
-                    <div className="h-px w-6 md:w-8 bg-white/20" />
+                  <div className="flex items-center gap-6">
+                    <div className="h-[2px] w-12 md:w-20 bg-white/40 shadow-[0_0_10px_rgba(255,255,255,0.3)]" />
+                    <span className="text-white text-[12px] md:text-[14px] font-black uppercase tracking-[0.5em] drop-shadow-lg">FILTER BY MAXIMUM PRICE</span>
+                    <div className="h-[2px] w-12 md:w-20 bg-white/40 shadow-[0_0_10px_rgba(255,255,255,0.3)]" />
                   </div>
-                  <div className="flex flex-wrap justify-center gap-2 p-2 liquid-glass rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl">
+                  <div className="flex flex-wrap justify-center gap-3 p-3 liquid-glass rounded-2xl border-2 border-white/20 shadow-[0_30px_100px_rgba(0,0,0,0.5)] backdrop-blur-3xl">
                     {['₹150', '₹300', '₹500', '₹1000', '₹2000'].map((opt) => (
                       <button
                         key={opt}
                         onClick={() => search(lastQuery, opt)}
-                        className={`px-5 md:px-6 py-2.5 md:py-3 rounded-xl text-[10px] md:text-[11px] transition-all duration-300 font-black tracking-wider ${
+                        className={`px-8 md:px-10 py-4 md:py-5 rounded-xl text-sm md:text-base transition-all duration-300 font-black tracking-widest border-2 ${
                           lastBudget === opt 
-                          ? 'bg-white text-black shadow-[0_15px_40px_rgba(255,255,255,0.2)] scale-105' 
-                          : 'text-white/60 hover:text-white hover:bg-white/5'
+                          ? 'bg-white text-black border-white shadow-[0_20px_50px_rgba(255,255,255,0.4)] scale-115 z-10' 
+                          : 'text-white border-transparent hover:border-white/40 hover:bg-white/10'
                         }`}
                       >
                         UNDER {opt}
