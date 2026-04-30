@@ -30,6 +30,71 @@ const LoadingMessage = () => {
   return <span>{loadingMessages[index]}</span>;
 };
 
+const ResultSkeleton: React.FC<{ i: number }> = ({ i }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, delay: i * 0.2 }}
+    className="liquid-glass rounded-2xl p-5 md:p-8 flex flex-col w-full relative overflow-hidden animate-pulse border border-white/5"
+  >
+    {/* Top Row */}
+    <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+      <div className="flex flex-col gap-3">
+        <div className="bg-white/10 h-10 md:h-14 w-48 md:w-64 rounded-xl" />
+        <div className="bg-white/5 h-4 w-32 md:w-40 rounded-lg" />
+        <div className="bg-white/10 h-8 w-24 rounded-lg mt-2" />
+      </div>
+
+      <div className="flex flex-row md:flex-col items-center gap-4 self-center md:self-auto">
+        <div className="w-[44px] h-[44px] rounded-full bg-white/5" />
+        <div className="w-[90px] h-[90px] md:w-[110px] md:h-[110px] rounded-full border-2 border-white/10 bg-white/5 flex flex-col items-center justify-center">
+          <div className="bg-white/10 h-6 w-12 rounded" />
+          <div className="bg-white/5 h-2 w-8 rounded mt-2" />
+        </div>
+      </div>
+    </div>
+
+    {/* Price & Volume */}
+    <div className="mt-8 flex items-baseline gap-3">
+      <div className="bg-white/10 h-10 md:h-14 w-32 rounded-xl" />
+      <div className="bg-white/5 h-4 w-16 rounded shadow-sm" />
+    </div>
+
+    {/* Scent DNA Area */}
+    <div className="mt-8 bg-white/5 h-16 rounded-xl border border-white/5" />
+
+    {/* Match Breakdown */}
+    <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-8">
+      {[1, 2].map((i) => (
+        <div key={i}>
+          <div className="bg-white/10 h-3 w-32 rounded-full mb-4" />
+          <div className="flex flex-col gap-3">
+            {[1, 2].map((j) => (
+              <div key={j} className="h-14 bg-white/5 rounded-xl border border-white/5" />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Performance Badges */}
+    <div className="mt-10 flex flex-wrap gap-3">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="h-10 w-28 bg-white/10 rounded-xl" />
+      ))}
+    </div>
+
+    {/* Verdict */}
+    <div className="mt-8 h-20 bg-white/10 rounded-2xl border border-white/20" />
+
+    {/* Buy Buttons */}
+    <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
+      <div className="h-14 w-full sm:w-48 bg-white/20 rounded-xl" />
+      <div className="h-14 w-full sm:w-48 bg-white/10 rounded-xl" />
+    </div>
+  </motion.div>
+);
+
 interface ResultsSectionProps {
   status: 'idle' | 'loading' | 'success' | 'error';
   data: any;
@@ -70,15 +135,7 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
                 </div>
               </div>
               {[1, 2, 3].map((i) => (
-                <div key={i} className="liquid-glass rounded-2xl p-6 md:p-8 animate-pulse border border-white/5">
-                  <div className="bg-white/10 h-8 w-40 md:w-48 rounded-md mb-4" />
-                  <div className="bg-white/5 h-4 w-24 md:w-32 rounded-md mb-10" />
-                  <div className="flex flex-col gap-4">
-                    <div className="bg-white/5 h-4 w-full rounded-md" />
-                    <div className="bg-white/5 h-4 w-4/5 rounded-md" />
-                    <div className="bg-white/5 h-4 w-3/5 rounded-md" />
-                  </div>
-                </div>
+                <ResultSkeleton key={i} i={i} />
               ))}
             </motion.div>
           )}
@@ -104,8 +161,8 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
                     ? "Too many searches. Please wait 60 seconds." 
                     : error === 'PARSE_FAIL' 
                     ? "Couldn't decode that fragrance. Try a different spelling." 
-                    : error === 'API_KEY_MISSING'
-                    ? "FragranceIQ is not connected. Admin: check API key."
+                    : error?.startsWith('API_KEY_MISSING')
+                    ? error.replace('API_KEY_MISSING: ', '')
                     : error === 'EMPTY_RESPONSE'
                     ? "The AI didn't return a match. Try a higher budget or more popular fragrance."
                     : error?.startsWith('SEARCH_ERROR')
@@ -220,6 +277,7 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
                     openingNotes={data.openingNotes}
                     drydownNotes={data.drydownNotes}
                     keyDrivers={data.keyDrivers}
+                    originalPerfume={data.originalPerfume}
                     applicationTip={data.applicationTip}
                     layeringTip={data.layeringTip}
                   />

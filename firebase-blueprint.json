@@ -1,0 +1,60 @@
+{
+  "entities": {
+    "Rating": {
+      "title": "Rating",
+      "description": "User rating for a suggested perfume dupe.",
+      "type": "object",
+      "properties": {
+        "targetPerfume": { "type": "string", "description": "The name of the dupe perfume" },
+        "targetBrand": { "type": "string", "description": "The brand of the dupe" },
+        "originalPerfume": { "type": "string", "description": "The designer perfume it imitates" },
+        "rating": { "type": "number", "description": "Rating from 1 to 5" },
+        "comment": { "type": "string", "description": "Optional user feedback" },
+        "userId": { "type": "string", "description": "UID of the user who rated" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the rating was created" }
+      },
+      "required": ["targetPerfume", "targetBrand", "originalPerfume", "rating", "userId", "createdAt"]
+    },
+    "Search": {
+      "title": "Search",
+      "description": "User's past fragrance search.",
+      "type": "object",
+      "properties": {
+        "query": { "type": "string", "description": "The perfume name searched" },
+        "budget": { "type": "string", "description": "The budget selected" },
+        "userId": { "type": "string", "description": "UID of the user" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the search was performed" }
+      },
+      "required": ["query", "budget", "userId", "createdAt"]
+    },
+    "SavedDupe": {
+      "title": "SavedDupe",
+      "description": "A perfume dupe saved by the user.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "brand": { "type": "string" },
+        "originalPerfume": { "type": "string" },
+        "price": { "type": "string" },
+        "similarityScore": { "type": "number" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "brand", "originalPerfume", "userId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "ratings/{ratingId}": {
+      "schema": "Rating",
+      "description": "Collection of dupe ratings"
+    },
+    "searches/{searchId}": {
+      "schema": "Search",
+      "description": "User search history"
+    },
+    "saved_dupes/{saveId}": {
+      "schema": "SavedDupe",
+      "description": "User's saved perfume dupes"
+    }
+  }
+}

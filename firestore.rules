@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function isValidRating(data) {
+      return data.keys().hasAll(['targetPerfume', 'targetBrand', 'originalPerfume', 'rating', 'userId', 'createdAt'])
+        && data.keys().size() == 6
+        && data.targetPerfume is string && data.targetPerfume.size() <= 200
+        && data.targetBrand is string && data.targetBrand.size() <= 200
+        && data.originalPerfume is string && data.originalPerfume.size() <= 200
+        && data.rating is number && data.rating >= 1 && data.rating <= 5
+        && data.userId == request.auth.uid
+        && data.createdAt == request.time;
+    }
+
+    function isValidSearch(data) {
+      return data.keys().hasAll(['query', 'budget', 'userId', 'createdAt'])
+        && data.keys().size() == 4
+        && data.query is string && data.query.size() <= 200
+        && data.budget is string && data.budget.size() <= 50
+        && data.userId == request.auth.uid
+        && data.createdAt == request.time;
+    }
+
+    function isValidSavedDupe(data) {
+      return data.keys().hasAll(['name', 'brand', 'originalPerfume', 'price', 'similarityScore', 'userId', 'createdAt'])
+        && data.name is string 
+        && data.brand is string 
+        && data.originalPerfume is string 
+        && data.price is string 
+        && data.similarityScore is number
+        && data.userId == request.auth.uid
+        && data.createdAt == request.time;
+    }
+
+    // Ratings Collection
+    match /ratings/{ratingId} {
+      allow create: if isSignedIn() 
+                    && isValidId(ratingId) 
+                    && isValidRating(incoming());
+      
+      allow update, delete: if false;
+
+      // Allow listing but usually we query where userId == auth.uid for profiles
+      allow list: if true; 
+      allow get: if true;
+    }
+
+    // Searches Collection
+    match /searches/{searchId} {
+      allow create: if isSignedIn() 
+                    && isValidId(searchId) 
+                    && isValidSearch(incoming());
+      
+      // Searches are private
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // Saved Dupes Collection
+    match /saved_dupes/{saveId} {
+      allow create: if isSignedIn() 
+                    && isValidSavedDupe(incoming());
+      
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update: if false;
+    }
+  }
+}

@@ -1,8 +1,12 @@
 
-import React from 'react';
-import { CheckCircle, XCircle, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { CheckCircle, XCircle, ExternalLink, Star, Bookmark, BookmarkCheck, Loader2, Copy, ClipboardCheck } from 'lucide-react';
 import ScentDNAAccordion from './ScentDNAAccordion';
-import { motion } from 'motion/react';
+import RatingSystem from './RatingSystem';
+import { motion, AnimatePresence } from 'motion/react';
+import { auth, db, OperationType, handleFirestoreError, signInWithGoogle } from '../lib/firebase';
+import { collection, addDoc, query, where, getDocs, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
 interface Recommendation {
   name: string;
@@ -32,6 +36,7 @@ interface ResultCardProps {
   keyDrivers: string;
   applicationTip: string;
   layeringTip: string | null;
+  originalPerfume: string;
 }
 
 const ResultCard: React.FC<ResultCardProps> = ({
@@ -44,22 +49,112 @@ const ResultCard: React.FC<ResultCardProps> = ({
   keyDrivers,
   applicationTip,
   layeringTip,
+  originalPerfume,
 }) => {
-  const scoreColor = perfume.similarityScore >= 75 
-    ? 'border-green-400/40 bg-green-400/10 text-green-400' 
-    : perfume.similarityScore >= 55 
-    ? 'border-yellow-400/40 bg-yellow-400/10 text-yellow-400' 
-    : 'border-red-400/40 bg-red-400/10 text-red-400';
+  const [user, setUser] = useState<User | null>(auth.currentUser);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveDocId, setSaveDocId] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      if (u) {
+        checkIfSaved(u.uid);
+      } else {
+        setIsSaved(false);
+        setSaveDocId(null);
+      }
+    });
+    return () => unsubscribe();
+  }, [perfume.name, perfume.brand]);
+
+  const checkIfSaved = async (uid: string) => {
+    try {
+      const q = query(
+        collection(db, 'saved_dupes'),
+        where('userId', '==', uid),
+        where('name', '==', perfume.name),
+        where('brand', '==', perfume.brand)
+      );
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        setIsSaved(true);
+        setSaveDocId(querySnapshot.docs[0].id);
+      }
+    } catch (error) {
+      console.error("Error checking if saved:", error);
+    }
+  };
+
+  const handleSaveToggle = async () => {
+    if (!user) {
+      try {
+        await signInWithGoogle();
+        return;
+      } catch (error) {
+        return;
+      }
+    }
+
+    setIsSaving(true);
+    try {
+      if (isSaved && saveDocId) {
+        await deleteDoc(doc(db, 'saved_dupes', saveDocId));
+        setIsSaved(false);
+        setSaveDocId(null);
+      } else {
+        const docRef = await addDoc(collection(db, 'saved_dupes'), {
+          name: perfume.name || 'Unknown',
+          brand: perfume.brand || 'Unknown',
+          originalPerfume: originalPerfume || 'Unknown',
+          price: perfume.price || 'N/A',
+          similarityScore: perfume.similarityScore || 0,
+          userId: user.uid,
+          createdAt: serverTimestamp()
+        });
+        setIsSaved(true);
+        setSaveDocId(docRef.id);
+      }
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, 'saved_dupes');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCopyUrl = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy URL:', err);
+    }
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 90) return 'border-green-400 text-green-400 shadow-[0_0_20px_rgba(74,222,128,0.4)] bg-green-400/20';
+    if (score >= 80) return 'border-yellow-400 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)] bg-yellow-400/15';
+    if (score >= 70) return 'border-blue-400 text-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.2)] bg-blue-400/10';
+    return 'border-white/20 text-white/60 bg-white/5';
+  };
+
+  const scoreClass = getScoreColor(perfume.similarityScore);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: index * 0.2 }}
-      className="liquid-glass rounded-2xl p-5 md:p-8 flex flex-col w-full"
+      className="liquid-glass rounded-2xl p-5 md:p-8 flex flex-col w-full relative overflow-hidden"
     >
+      {/* Background Scent Accents */}
+      <div className={`absolute -top-20 -right-20 w-40 h-40 rounded-full blur-[100px] opacity-10 ${perfume.similarityScore >= 90 ? 'bg-green-400' : 'bg-white'}`} />
+
       {/* Top Row */}
-      <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+      <div className="flex flex-col md:flex-row justify-between items-start gap-6 relative z-10">
         <div className="flex flex-col">
           <h3 className="font-heading italic text-3xl md:text-5xl text-white leading-tight drop-shadow-md">
             {perfume.name}
@@ -72,10 +167,39 @@ const ResultCard: React.FC<ResultCardProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-row md:flex-col items-center gap-4 self-center md:self-auto">
-          <div className={`w-[80px] h-[80px] md:w-[100px] md:h-[100px] rounded-full border-4 flex flex-col items-center justify-center shadow-2xl bg-black/40 ${scoreColor}`}>
-            <span className="font-heading italic text-3xl md:text-4xl leading-none font-bold text-white">{perfume.similarityScore}%</span>
-            <span className="text-[10px] md:text-[12px] font-black uppercase tracking-tight text-white drop-shadow-sm">match</span>
+          <div className="flex flex-row md:flex-col items-center gap-4 self-center md:self-auto">
+            {/* Save Button */}
+            <button
+              onClick={handleSaveToggle}
+              disabled={isSaving}
+              className={`p-3 rounded-full border transition-all duration-300 ${
+                isSaved 
+                  ? 'bg-yellow-400 border-yellow-400 text-black shadow-[0_0_15px_rgba(250,204,21,0.4)]' 
+                  : 'bg-white/5 border-white/10 text-white/40 hover:text-white hover:border-white/40'
+              }`}
+            >
+              {isSaving ? (
+                <Loader2 size={20} className="animate-spin" />
+              ) : isSaved ? (
+                <BookmarkCheck size={20} />
+              ) : (
+                <Bookmark size={20} />
+              )}
+            </button>
+
+            <div className={`w-[90px] h-[90px] md:w-[110px] md:h-[110px] rounded-full border-[3px] flex flex-col items-center justify-center shadow-2xl backdrop-blur-md transition-all duration-700 ${scoreClass}`}>
+            <motion.span 
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.2 + 0.5, type: 'spring' }}
+              className="font-heading italic text-3xl md:text-4xl leading-none font-bold"
+            >
+              {Math.round(perfume.similarityScore)}%
+            </motion.span>
+            <span className="text-[10px] md:text-[12px] font-black uppercase tracking-tight opacity-80">match</span>
+            
+            {/* Inner Ring Glow */}
+            <div className={`absolute inset-0 rounded-full border-2 border-white/10 ${perfume.similarityScore >= 90 ? 'animate-pulse' : ''}`} />
           </div>
         </div>
       </div>
@@ -149,20 +273,65 @@ const ResultCard: React.FC<ResultCardProps> = ({
         </p>
       </div>
 
+      {/* Accuracy Rating */}
+      <RatingSystem 
+        targetPerfume={perfume.name}
+        targetBrand={perfume.brand}
+        originalPerfume={originalPerfume}
+      />
+
       {/* Buy Buttons */}
       <div className="mt-10 flex flex-col sm:flex-row flex-wrap gap-3 justify-center">
         {/* Priority Direct Link */}
         {perfume.productUrl && perfume.productUrl.startsWith('http') && (
-          <a 
-            href={perfume.productUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-lg px-6 md:px-8 py-3.5 md:py-4 text-xs md:text-sm font-black transition-all flex items-center justify-center gap-2 cursor-pointer z-20 relative shadow-2xl border-2 bg-yellow-400 text-black border-yellow-500/50 shadow-yellow-400/20 hover:scale-105 active:scale-95 w-full sm:w-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <span className="font-black uppercase tracking-tight">Direct Purchase</span>
-            <ExternalLink size={14} strokeWidth={3} />
-          </a>
+          <div className="flex items-stretch gap-0.5 w-full sm:w-auto">
+            <a 
+              href={perfume.productUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-l-lg px-6 md:px-8 py-3.5 md:py-4 text-xs md:text-sm font-black transition-all flex items-center justify-center gap-2 cursor-pointer z-20 relative shadow-2xl border-2 border-r-0 bg-yellow-400 text-black border-yellow-500/50 shadow-yellow-400/20 hover:bg-yellow-300 active:scale-[0.98] flex-1 sm:flex-none sm:min-w-[180px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="font-black uppercase tracking-tight">Direct Purchase</span>
+              <ExternalLink size={14} strokeWidth={3} />
+            </a>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCopyUrl(perfume.productUrl!);
+              }}
+              className={`rounded-r-lg px-4 py-3.5 md:py-4 transition-all flex items-center justify-center z-20 relative shadow-2xl border-2 border-l-0 ${
+                copied 
+                  ? 'bg-green-500 text-white border-green-600' 
+                  : 'bg-yellow-400 text-black border-yellow-500/50'
+              } hover:brightness-110 active:scale-[0.98] group`}
+              title="Copy link"
+            >
+              <AnimatePresence mode="wait">
+                {copied ? (
+                  <motion.div
+                    key="check"
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.5, opacity: 0 }}
+                    className="flex items-center gap-1"
+                  >
+                    <ClipboardCheck size={16} strokeWidth={3} />
+                    <span className="text-[10px] font-black uppercase tracking-tighter">Copied!</span>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="copy"
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.5, opacity: 0 }}
+                  >
+                    <Copy size={16} strokeWidth={3} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </button>
+          </div>
         )}
 
         {/* Platform Buttons */}

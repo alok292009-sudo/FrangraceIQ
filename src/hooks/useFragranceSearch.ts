@@ -2,6 +2,8 @@
 import { useState, useRef } from "react";
 import { callGemini } from "../lib/geminiClient";
 import { parseResponse } from "../lib/responseParser";
+import { auth, db, OperationType, handleFirestoreError } from "../lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export type SearchStatus = "idle" | "loading" | "success" | "error";
 
@@ -15,6 +17,24 @@ export function useFragranceSearch() {
   const [lastBudget, setLastBudget] = useState<string>("₹300");
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  const saveSearchToHistory = async (query: string, budget: string) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+      const path = "searches";
+      await addDoc(collection(db, path), {
+        query,
+        budget,
+        userId: user.uid,
+        createdAt: serverTimestamp(),
+      });
+    } catch (err) {
+      // Non-blocking error for history
+      console.warn("Failed to save search history:", err);
+    }
+  };
+
   const search = async (perfumeName: string, budget: string = "₹300") => {
     if (!perfumeName.trim()) return;
     
@@ -26,6 +46,9 @@ export function useFragranceSearch() {
     const cacheKey = `${perfumeName.toLowerCase()}-${budget}`;
     setLastQuery(perfumeName);
     setLastBudget(budget);
+
+    // Save search if user logged in
+    saveSearchToHistory(perfumeName, budget);
 
     // Speed up with cache
     if (searchHistoryCache[cacheKey]) {
@@ -68,7 +91,7 @@ export function useFragranceSearch() {
       } else if (e.message === "PARSE_FAIL") {
         setError("PARSE_FAIL");
       } else if (e.message === "API_KEY_MISSING") {
-        setError("API_KEY_MISSING");
+        setError("API_KEY_MISSING: The fragrance intelligence engine is currently offline. Please notify the administrator to check the Gemini API configuration.");
       } else if (e.message === "EMPTY_RESPONSE") {
         setError("EMPTY_RESPONSE");
       } else if (e.message.startsWith("SEARCH_ERROR")) {
