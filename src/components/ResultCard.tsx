@@ -151,17 +151,25 @@ const ResultCard: React.FC<ResultCardProps> = ({
       <div className="mt-10 flex flex-wrap gap-3 justify-center">
         {perfume.availableOn.map((platform) => {
           const cleanPlatform = platform.trim();
-          const searchTerm = encodeURIComponent(`${perfume.brand} ${perfume.name} perfume buy online India`);
+          const lowerPlatform = cleanPlatform.toLowerCase();
           
-          let url = perfume.productUrl || `https://www.google.com/search?q=${searchTerm}`;
+          // Enhanced search terms to ensure better results
+          const baseSearch = `${perfume.brand} ${perfume.name}`;
+          const marketplaceSearch = encodeURIComponent(`${baseSearch} perfume`);
+          const googleSearch = encodeURIComponent(`${baseSearch} perfume buy online India original`);
+
+          // Prioritize the direct product URL if provided by AI
+          let url = (perfume.productUrl && perfume.productUrl.startsWith('http')) 
+            ? perfume.productUrl 
+            : `https://www.google.com/search?q=${googleSearch}`;
           
-          if (!perfume.productUrl) {
-            if (cleanPlatform.toLowerCase().includes('amazon')) {
-              url = `https://www.amazon.in/s?k=${encodeURIComponent(`${perfume.brand} ${perfume.name}`)}`;
-            } else if (cleanPlatform.toLowerCase().includes('flipkart')) {
-              url = `https://www.flipkart.com/search?q=${encodeURIComponent(`${perfume.brand} ${perfume.name}`)}`;
-            } else if (cleanPlatform.toLowerCase().includes('meesho')) {
-              url = `https://www.meesho.com/search?q=${encodeURIComponent(`${perfume.brand} ${perfume.name}`)}`;
+          if (!perfume.productUrl || !perfume.productUrl.startsWith('http')) {
+            if (lowerPlatform.includes('amazon')) {
+              url = `https://www.amazon.in/s?k=${marketplaceSearch}`;
+            } else if (lowerPlatform.includes('flipkart')) {
+              url = `https://www.flipkart.com/search?q=${marketplaceSearch}`;
+            } else if (lowerPlatform.includes('meesho')) {
+              url = `https://www.meesho.com/search?q=${marketplaceSearch}`;
             }
           }
 
