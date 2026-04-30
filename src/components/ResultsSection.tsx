@@ -9,7 +9,7 @@ const loadingMessages = [
   "Scanning r/DesiFragranceAddicts...",
   "Searching YouTube (Joy Amin & others)...",
   "Checking Instagram reviews...",
-  "Scanning Muzna & Scentrix inventory...",
+  "Scanning Scentedelic & Scentrix inventory...",
   "Calculating similarity scores...",
   "Eliminating synthetic alcohol bombs...",
   "Finding hidden budget gems...",

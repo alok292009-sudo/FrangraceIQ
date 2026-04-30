@@ -8,7 +8,8 @@ interface Recommendation {
   name: string;
   brand: string;
   type: string;
-  priceRange: string;
+  price: string;
+  volume: string;
   availableOn: string[];
   productUrl?: string | null;
   similarityScore: number;
@@ -79,9 +80,10 @@ const ResultCard: React.FC<ResultCardProps> = ({
         </div>
       </div>
 
-      {/* Price */}
-      <div className="mt-8">
-        <span className="text-yellow-400 font-heading italic text-4xl drop-shadow-lg filter brightness-110">{perfume.priceRange}</span>
+      {/* Price & Volume */}
+      <div className="mt-8 flex items-baseline gap-3">
+        <span className="text-yellow-400 font-heading italic text-4xl drop-shadow-lg filter brightness-110">{perfume.price}</span>
+        <span className="text-white/40 font-black uppercase text-sm tracking-widest">{perfume.volume}</span>
       </div>
 
       {/* Scent DNA Accordion */}
@@ -149,28 +151,39 @@ const ResultCard: React.FC<ResultCardProps> = ({
 
       {/* Buy Buttons */}
       <div className="mt-10 flex flex-wrap gap-3 justify-center">
-        {perfume.availableOn.map((platform) => {
+        {/* Priority Direct Link */}
+        {perfume.productUrl && perfume.productUrl.startsWith('http') && (
+          <a 
+            href={perfume.productUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg px-8 py-4 text-sm font-black transition-all flex items-center gap-2 cursor-pointer z-20 relative shadow-2xl border-2 bg-yellow-400 text-black border-yellow-500/50 shadow-yellow-400/20 hover:scale-105 active:scale-95"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span className="font-black uppercase tracking-tight">Direct Purchase</span>
+            <ExternalLink size={14} strokeWidth={3} />
+          </a>
+        )}
+
+        {/* Platform Buttons */}
+        {perfume.availableOn.filter(p => p.trim() !== "").map((platform) => {
           const cleanPlatform = platform.trim();
           const lowerPlatform = cleanPlatform.toLowerCase();
           
-          // Enhanced search terms to ensure better results
+          if (lowerPlatform.includes('website') && perfume.productUrl) return null;
+
           const baseSearch = `${perfume.brand} ${perfume.name}`;
-          const marketplaceSearch = encodeURIComponent(`${baseSearch} perfume`);
+          const marketplaceSearch = encodeURIComponent(`${baseSearch} ${perfume.volume || ''} perfume`);
           const googleSearch = encodeURIComponent(`${baseSearch} perfume buy online India original`);
 
-          // Prioritize the direct product URL if provided by AI
-          let url = (perfume.productUrl && perfume.productUrl.startsWith('http')) 
-            ? perfume.productUrl 
-            : `https://www.google.com/search?q=${googleSearch}`;
+          let url = `https://www.google.com/search?q=${googleSearch}`;
           
-          if (!perfume.productUrl || !perfume.productUrl.startsWith('http')) {
-            if (lowerPlatform.includes('amazon')) {
-              url = `https://www.amazon.in/s?k=${marketplaceSearch}`;
-            } else if (lowerPlatform.includes('flipkart')) {
-              url = `https://www.flipkart.com/search?q=${marketplaceSearch}`;
-            } else if (lowerPlatform.includes('meesho')) {
-              url = `https://www.meesho.com/search?q=${marketplaceSearch}`;
-            }
+          if (lowerPlatform.includes('amazon')) {
+            url = `https://www.amazon.in/s?k=${marketplaceSearch}`;
+          } else if (lowerPlatform.includes('flipkart')) {
+            url = `https://www.flipkart.com/search?q=${marketplaceSearch}`;
+          } else if (lowerPlatform.includes('meesho')) {
+            url = `https://www.meesho.com/search?q=${marketplaceSearch}`;
           }
 
           return (
@@ -179,15 +192,11 @@ const ResultCard: React.FC<ResultCardProps> = ({
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`rounded-lg px-8 py-4 text-sm font-black transition-all flex items-center gap-2 cursor-pointer z-20 relative shadow-2xl border-2 hover:scale-105 active:scale-95 ${
-                lowerPlatform.includes('website') || lowerPlatform.includes('official')
-                  ? 'bg-yellow-400 text-black border-yellow-500/50 shadow-yellow-400/20'
-                  : 'bg-white text-black border-white/30'
-              }`}
+              className="rounded-lg px-8 py-4 text-sm font-black transition-all flex items-center gap-2 cursor-pointer z-20 relative shadow-2xl border-2 bg-white text-black border-white/30 hover:scale-105 active:scale-95"
               onClick={(e) => e.stopPropagation()}
             >
               <span className="font-black uppercase tracking-tight">
-                {lowerPlatform.includes('website') ? 'Visit Official Store' : `Buy on ${cleanPlatform}`}
+                {`Search on ${cleanPlatform}`}
               </span>
               <ExternalLink size={14} strokeWidth={3} />
             </a>
