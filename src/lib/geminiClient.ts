@@ -107,8 +107,9 @@ export async function callGemini(perfumeName: string, budget: string = "₹300")
   const prompt = `Find the best Indian market dupes (prioritize underrated/niche hidden gems) under ${budget} for: ${perfumeName}\n\n${FRAGRANCE_SYSTEM_PROMPT}`;
 
   try {
+    // Using gemini-flash-latest as recommended for stable flash capabilities
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-flash-latest",
       contents: [{ parts: [{ text: prompt }] }],
       config: {
         temperature: 0.3,
@@ -125,9 +126,22 @@ export async function callGemini(perfumeName: string, budget: string = "₹300")
     return text;
   } catch (error: any) {
     console.error("Gemini SDK Error:", error);
-    if (error.message?.includes("RATE_LIMIT") || error.message?.includes("429")) {
+    
+    // Check for specific error types to provide better feedback
+    const errorMessage = error.message || String(error);
+    
+    if (errorMessage.includes("429") || errorMessage.includes("RATE_LIMIT")) {
       throw new Error("RATE_LIMIT");
     }
-    throw error;
+    
+    if (errorMessage.includes("404") || errorMessage.includes("not found")) {
+      throw new Error("SEARCH_ERROR: The fragrance model is currently unavailable in your region.");
+    }
+
+    if (errorMessage.includes("403") || errorMessage.includes("permission denied") || errorMessage.includes("API key")) {
+      throw new Error("API_KEY_MISSING");
+    }
+
+    throw new Error(`SEARCH_ERROR: ${errorMessage}`);
   }
 }
