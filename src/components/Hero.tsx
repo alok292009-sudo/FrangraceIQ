@@ -98,7 +98,7 @@ export default function Hero({ search, status }: HeroProps) {
           initial={{ opacity: 0, filter: 'blur(10px)', y: 20 }}
           animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
           transition={{ duration: 0.8, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="text-white/80 font-body font-light text-base md:text-lg max-w-xl leading-relaxed mb-8"
+          className="text-white font-body font-medium text-base md:text-lg max-w-xl leading-relaxed mb-8 drop-shadow-sm"
         >
           Enter any luxury perfume. AI decodes its scent DNA and finds the closest Indian market matches within your budget.
         </motion.p>
@@ -110,22 +110,22 @@ export default function Hero({ search, status }: HeroProps) {
             initial={{ opacity: 0, filter: 'blur(10px)', y: 20 }}
             animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
             transition={{ duration: 0.8, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
-            className="liquid-glass-strong rounded-full p-2 flex items-center gap-2 w-full"
+            className="liquid-glass-strong rounded-full p-2 flex items-center gap-2 w-full shadow-2xl"
           >
             <input
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Try 'Dior Sauvage' or 'Creed Aventus'..."
-              className="flex-1 bg-transparent text-white placeholder-white/40 text-sm md:text-base font-body outline-none px-6"
+              className="flex-1 bg-transparent text-white placeholder-white/60 text-sm md:text-base font-semibold outline-none px-6"
             />
             <button
               type="submit"
               disabled={status === 'loading'}
-              className="bg-white text-black rounded-full px-6 py-3 text-sm font-medium flex items-center gap-1.5 transition-all hover:bg-white/90 active:scale-95 disabled:opacity-50"
+              className="bg-white text-black rounded-full px-8 py-3 text-sm font-bold flex items-center gap-1.5 transition-all hover:bg-white/90 active:scale-95 disabled:opacity-50"
             >
               {status === 'loading' ? 'Searching...' : 'Find Dupe'}
-              <ArrowUpRight size={16} />
+              <ArrowUpRight size={16} strokeWidth={2.5} />
             </button>
           </motion.form>
 
@@ -136,16 +136,16 @@ export default function Hero({ search, status }: HeroProps) {
             transition={{ duration: 0.8, delay: 1.3, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-col items-center gap-3"
           >
-            <span className="text-white/30 text-[10px] uppercase tracking-[0.2em]">Select Your Budget</span>
-            <div className="flex gap-2 p-1.5 liquid-glass rounded-full">
+            <span className="text-white/60 text-[10px] font-bold uppercase tracking-[0.2em] drop-shadow-sm">Select Your Budget</span>
+            <div className="flex gap-2 p-1.5 liquid-glass rounded-full border border-white/10">
               {budgetOptions.map((opt) => (
                 <button
                   key={opt}
                   onClick={() => setBudget(opt)}
-                  className={`px-4 py-1.5 rounded-full text-xs transition-all duration-300 ${
+                  className={`px-5 py-2 rounded-full text-xs transition-all duration-300 ${
                     budget === opt 
-                    ? 'bg-white text-black font-medium' 
-                    : 'text-white/40 hover:text-white hover:bg-white/5'
+                    ? 'bg-white text-black font-bold shadow-lg' 
+                    : 'text-white hover:text-white hover:bg-white/10 font-medium'
                   }`}
                 >
                   {opt}
@@ -163,14 +163,14 @@ export default function Hero({ search, status }: HeroProps) {
             transition={{ delay: 0.2, duration: 0.8 }}
             className="flex flex-wrap justify-center gap-3 mt-8 max-w-xl"
           >
-            <div className="w-full text-white/30 text-[10px] uppercase tracking-[0.2em] mb-1">
+            <div className="w-full text-white/50 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">
               {history.length > 0 ? 'Recent Searches' : 'Popular Suggestions'}
             </div>
             {displaySuggestions.map((name) => (
               <button
                 key={name}
                 onClick={() => handleSuggestionClick(name)}
-                className="liquid-glass rounded-full px-4 py-1.5 text-xs text-white/50 hover:text-white hover:bg-white/[0.05] transition-all"
+                className="liquid-glass rounded-full px-5 py-2 text-xs text-white hover:text-white hover:bg-white/10 transition-all font-semibold border border-white/5"
               >
                 {name}
               </button>

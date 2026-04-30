@@ -92,10 +92,11 @@ No markdown. No explanation. No preamble. Pure JSON only.
 `;
 
 export async function callGemini(perfumeName: string, budget: string = "₹300") {
-  // Try to find the API key in various typical locations
-  const apiKey = process.env.GEMINI_API_KEY || 
-                 (import.meta as any).env?.VITE_GEMINI_API_KEY ||
-                 (import.meta as any).env?.GEMINI_API_KEY;
+  // Most compatible way for Vite to handle env vars across different platforms
+  const metaEnv = (import.meta as any).env || {};
+  const apiKey = metaEnv.VITE_GEMINI_API_KEY || 
+                 metaEnv.GEMINI_API_KEY ||
+                 process.env.GEMINI_API_KEY;
   
   if (!apiKey || apiKey === "your_actual_key_here") {
     console.error("Gemini API Key is missing. Please check your AI Studio secrets.");

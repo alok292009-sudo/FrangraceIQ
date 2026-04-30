@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-heading: "Instrument Serif", serif;
-  --font-body: "Barlow", sans-serif;
+  --font-body: "Inter", sans-serif;
 
   --color-background: hsl(213 45% 67%);
   --color-foreground: hsl(0 0% 100%);

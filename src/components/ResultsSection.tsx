@@ -38,11 +38,11 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
         )}
 
         {status === 'error' && (
-          <div className="liquid-glass rounded-2xl p-12 border border-red-500/20 bg-red-500/5 flex flex-col items-center text-center gap-6">
-            <AlertCircle size={48} className="text-red-400" />
-            <div className="flex flex-col gap-2">
-              <h3 className="text-xl font-heading italic text-white">Something went wrong</h3>
-              <p className="text-white/50 text-sm max-w-xs">
+          <div className="liquid-glass rounded-2xl p-12 border border-red-500/30 bg-red-500/10 flex flex-col items-center text-center gap-6 shadow-2xl">
+            <AlertCircle size={64} className="text-red-400" />
+            <div className="flex flex-col gap-4">
+              <h3 className="text-2xl font-heading italic text-white drop-shadow-md">Something went wrong</h3>
+              <p className="text-white font-medium text-sm max-w-xs leading-relaxed">
                 {error === 'RATE_LIMIT' 
                   ? "Too many searches. Please wait 60 seconds." 
                   : error === 'PARSE_FAIL' 
@@ -58,17 +58,17 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
             </div>
 
             {/* Budget options on retry */}
-            <div className="flex flex-col items-center gap-3 mt-2">
-              <span className="text-white/30 text-[10px] uppercase tracking-widest">Adjust Budget</span>
-              <div className="flex gap-2 p-1 liquid-glass rounded-lg">
+            <div className="flex flex-col items-center gap-4 mt-4">
+              <span className="text-white/60 text-[11px] font-black uppercase tracking-widest">Adjust Budget</span>
+              <div className="flex gap-2.5 p-2 liquid-glass rounded-xl border border-white/10">
                 {['₹150', '₹300', '₹500', '₹1000'].map((opt) => (
                   <button
                     key={opt}
                     onClick={() => search(lastQuery, opt)}
-                    className={`px-4 py-1.5 rounded-md text-[10px] transition-all duration-300 ${
+                    className={`px-5 py-2 rounded-lg text-xs transition-all duration-300 font-bold ${
                       lastBudget === opt 
-                      ? 'bg-white text-black font-medium' 
-                      : 'text-white/40 hover:text-white hover:bg-white/5'
+                      ? 'bg-white text-black shadow-lg' 
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
                     }`}
                   >
                     {opt}
@@ -79,7 +79,7 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
 
             <button 
               onClick={() => search(lastQuery, lastBudget)}
-              className="liquid-glass-strong rounded-lg px-8 py-3 text-sm font-medium text-white hover:scale-105 transition-transform"
+              className="bg-white text-black rounded-xl px-10 py-4 text-sm font-black hover:scale-105 active:scale-95 transition-all shadow-xl mt-4"
             >
               Try Again
             </button>
@@ -87,20 +87,20 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
         )}
 
         {status === 'success' && data && (
-          <div className="flex flex-col gap-12">
-            <div className="text-center mb-8">
-              <span className="text-white/30 text-[10px] uppercase tracking-widest block mb-2">Results for</span>
-              <h2 className="text-4xl md:text-5xl font-heading italic text-white leading-tight">
+          <div className="flex flex-col gap-14">
+            <div className="text-center mb-10">
+              <span className="text-white/60 text-[11px] font-black uppercase tracking-[0.3em] block mb-3">Results for</span>
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-heading italic text-white leading-tight drop-shadow-lg">
                 {data.originalPerfume}
               </h2>
               {data.recommendations.length === 0 && (
-                <p className="text-white/50 italic mt-6">
+                <p className="text-white/80 font-bold italic mt-8 text-lg">
                   No budget clones found that meet our quality ceiling.
                 </p>
               )}
             </div>
 
-            <div className="flex flex-col gap-10">
+            <div className="flex flex-col gap-12">
               {data.recommendations.map((perfume: any, idx: number) => (
                 <ResultCard 
                   key={idx}
@@ -118,23 +118,23 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
             </div>
 
             {/* Price Range Refinement after Success */}
-            <div className="mt-8 flex flex-col items-center gap-6 py-12 border-t border-white/5">
-                <div className="flex flex-col items-center gap-2">
-                  <span className="text-white/30 text-[10px] uppercase tracking-widest">Not what you're looking for?</span>
-                  <p className="text-white/50 text-xs text-center max-w-xs">
-                    Try refining your budget. Higher budgets often unlock long-lasting niche dupe houses.
+            <div className="mt-12 flex flex-col items-center gap-8 py-16 border-t border-white/10">
+                <div className="flex flex-col items-center gap-3">
+                  <span className="text-white/70 text-[11px] font-black uppercase tracking-[0.2em]">Not what you're looking for?</span>
+                  <p className="text-white text-sm text-center max-w-sm font-medium leading-relaxed">
+                    Try refining your budget. Higher budgets often unlock long-lasting niche dupe houses with better scent accuracy.
                   </p>
                 </div>
                 
-                <div className="flex gap-2 p-1.5 liquid-glass rounded-xl">
+                <div className="flex flex-wrap justify-center gap-2.5 p-2 liquid-glass rounded-2xl border border-white/10">
                   {['₹150', '₹300', '₹500', '₹1000', '₹2000'].map((opt) => (
                     <button
                       key={opt}
                       onClick={() => search(lastQuery, opt)}
-                      className={`px-6 py-2 rounded-lg text-xs transition-all duration-300 font-body ${
+                      className={`px-7 py-2.5 rounded-xl text-xs transition-all duration-300 font-bold ${
                         lastBudget === opt 
-                        ? 'bg-white text-black font-semibold shadow-[0_0_20px_rgba(255,255,255,0.3)]' 
-                        : 'text-white/40 hover:text-white hover:bg-white/10'
+                        ? 'bg-white text-black shadow-[0_10px_30px_rgba(255,255,255,0.2)]' 
+                        : 'text-white/70 hover:text-white hover:bg-white/10'
                       }`}
                     >
                       {opt}
@@ -143,13 +143,17 @@ export default function ResultsSection({ status, data, error, lastQuery, lastBud
                 </div>
             </div>
 
-            <div className="mt-16 p-8 liquid-glass rounded-2xl border border-white/5 text-center flex flex-col items-center gap-4">
-               <h4 className="text-white/60 text-xs font-semibold uppercase tracking-widest">REALITY VERDICT</h4>
-               <p className="text-white/80 font-body font-light text-base leading-relaxed italic">
+            <div className="mt-16 p-10 liquid-glass rounded-3xl border border-white/10 text-center flex flex-col items-center gap-6 shadow-2xl">
+               <div className="flex items-center gap-3">
+                  <div className="h-[1px] w-8 bg-white/20"></div>
+                  <h4 className="text-white text-xs font-black uppercase tracking-[0.3em]">REALITY VERDICT</h4>
+                  <div className="h-[1px] w-8 bg-white/20"></div>
+               </div>
+               <p className="text-white font-body font-bold text-lg md:text-xl leading-relaxed italic max-w-2xl">
                  "{data.realityVerdict}"
                </p>
-               <div className="h-px w-20 bg-white/10 mt-2" />
-               <p className="text-white/40 text-xs mt-2">
+               <div className="h-px w-full max-w-xs bg-white/10" />
+               <p className="text-white/80 text-sm font-medium leading-relaxed max-w-xl">
                  {data.budgetAdvice}
                </p>
             </div>

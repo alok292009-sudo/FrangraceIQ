@@ -20,12 +20,12 @@ export default function Navbar() {
       </div>
 
       {/* Center: Desktop Navigation */}
-      <div className="hidden md:flex items-center gap-1 liquid-glass rounded-full px-1.5 py-1">
+      <div className="hidden md:flex items-center gap-1 liquid-glass rounded-full px-2 py-1.5 border border-white/10 shadow-lg">
         {navLinks.map((link) => (
           <a
             key={link}
             href={`#${link.toLowerCase().replace(/ /g, '-')}`}
-            className="px-4 py-2 text-sm font-medium text-white/90 hover:text-white transition-colors font-body"
+            className="px-5 py-2 text-sm font-bold text-white hover:bg-white/10 rounded-full transition-all font-body"
           >
             {link}
           </a>
@@ -34,9 +34,9 @@ export default function Navbar() {
 
       {/* Right: CTA */}
       <div>
-        <a href="#search" className="liquid-glass-strong text-white rounded-full px-5 py-2 text-sm font-medium flex items-center gap-1.5 transition-all active:scale-95">
+        <a href="#search" className="bg-white text-black rounded-full px-6 py-2.5 text-sm font-black flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 shadow-xl">
           Find My Dupe
-          <ArrowUpRight size={16} />
+          <ArrowUpRight size={16} strokeWidth={2.5} />
         </a>
       </div>
     </motion.nav>
