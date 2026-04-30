@@ -31,15 +31,16 @@ export default function Stats() {
           viewport={{ once: true }}
           className="liquid-glass rounded-[3rem] p-12 md:p-16 flex flex-col items-center gap-16"
         >
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 md:gap-20 w-full">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 md:gap-24 w-full">
             {stats.map((stat, idx) => (
-              <div key={idx} className="flex flex-col items-center text-center gap-4">
-                <span className="text-4xl md:text-5xl font-heading italic text-white tracking-tight">
+              <div key={idx} className="flex flex-col items-center text-center gap-5">
+                <span className="text-5xl md:text-6xl font-heading italic text-white tracking-tight drop-shadow-xl">
                   {stat.value}
                 </span>
-                <span className="text-white/60 font-body font-light text-sm tracking-widest uppercase">
+                <span className="text-white font-body font-black text-[11px] tracking-[0.3em] uppercase opacity-90 drop-shadow-sm">
                   {stat.label}
                 </span>
+                <div className="h-1 w-12 bg-white/20 rounded-full"></div>
               </div>
             ))}
           </div>

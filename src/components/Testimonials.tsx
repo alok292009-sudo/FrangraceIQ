@@ -25,16 +25,16 @@ export default function Testimonials() {
         
         {/* Header */}
         <div className="flex flex-col items-center text-center gap-6">
-          <div className="liquid-glass rounded-full px-4 py-1 text-[10px] font-semibold uppercase tracking-widest text-white/70">
+          <div className="liquid-glass rounded-full px-6 py-2 text-[11px] font-black uppercase tracking-[0.3em] text-white border border-white/20 shadow-lg">
             Real Users
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-7xl font-heading italic text-white tracking-tight leading-[0.9]">
+          <h2 className="text-4xl md:text-5xl lg:text-7xl font-heading italic text-white tracking-tight leading-[0.9] drop-shadow-lg">
             Don't take our word for it.
           </h2>
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {testimonials.map((t, idx) => (
             <motion.div
               key={idx}
@@ -42,14 +42,14 @@ export default function Testimonials() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: idx * 0.15, ease: [0.22, 1, 0.36, 1] }}
               viewport={{ once: true }}
-              className="liquid-glass rounded-[2rem] p-10 md:p-12 flex flex-col gap-10 hover:bg-white/[0.03] transition-colors"
+              className="liquid-glass rounded-[2.5rem] p-12 flex flex-col gap-10 hover:bg-white/10 transition-all border-2 border-white/10 shadow-2xl"
             >
-              <p className="text-white/80 font-body font-light text-lg italic leading-relaxed">
+              <p className="text-white font-body font-bold text-xl italic leading-relaxed">
                 "{t.quote}"
               </p>
-              <div className="flex flex-col gap-1 mt-auto">
-                <span className="text-white font-body font-medium text-base">— {t.name}</span>
-                <span className="text-white/40 font-body font-light text-xs uppercase tracking-widest">{t.role}</span>
+              <div className="flex flex-col gap-2 mt-auto">
+                <span className="text-white font-body font-black text-lg">— {t.name}</span>
+                <span className="text-white font-body font-black text-[10px] uppercase tracking-[0.3em] opacity-60 bg-white/10 w-fit px-3 py-1 rounded-full">{t.role}</span>
               </div>
             </motion.div>
           ))}

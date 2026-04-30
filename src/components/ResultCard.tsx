@@ -151,17 +151,17 @@ const ResultCard: React.FC<ResultCardProps> = ({
       <div className="mt-10 flex flex-wrap gap-3 justify-center">
         {perfume.availableOn.map((platform) => {
           const cleanPlatform = platform.trim();
-          const searchTerm = encodeURIComponent(`${perfume.name} ${perfume.brand} perfume India`);
+          const searchTerm = encodeURIComponent(`${perfume.brand} ${perfume.name} perfume buy online India`);
           
           let url = perfume.productUrl || `https://www.google.com/search?q=${searchTerm}`;
           
           if (!perfume.productUrl) {
             if (cleanPlatform.toLowerCase().includes('amazon')) {
-              url = `https://www.amazon.in/s?k=${searchTerm}`;
+              url = `https://www.amazon.in/s?k=${encodeURIComponent(`${perfume.brand} ${perfume.name}`)}`;
             } else if (cleanPlatform.toLowerCase().includes('flipkart')) {
-              url = `https://www.flipkart.com/search?q=${searchTerm}`;
+              url = `https://www.flipkart.com/search?q=${encodeURIComponent(`${perfume.brand} ${perfume.name}`)}`;
             } else if (cleanPlatform.toLowerCase().includes('meesho')) {
-              url = `https://www.meesho.com/search?q=${searchTerm}`;
+              url = `https://www.meesho.com/search?q=${encodeURIComponent(`${perfume.brand} ${perfume.name}`)}`;
             }
           }
 
@@ -199,6 +199,15 @@ const ResultCard: React.FC<ResultCardProps> = ({
           className="text-xs text-white font-black hover:text-white/80 transition-colors flex items-center gap-2 bg-orange-600/20 px-3 py-1.5 rounded-full border border-orange-500/20"
         >
           <span>Reddit Discussions</span>
+          <ExternalLink size={12} />
+        </a>
+        <a 
+          href={`https://www.instagram.com/explore/tags/${perfume.name.replace(/\s+/g, '').toLowerCase()}/`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-white font-black hover:text-white/80 transition-colors flex items-center gap-2 bg-pink-600/20 px-3 py-1.5 rounded-full border border-pink-500/20"
+        >
+          <span>Instagram Feed</span>
           <ExternalLink size={12} />
         </a>
       </div>

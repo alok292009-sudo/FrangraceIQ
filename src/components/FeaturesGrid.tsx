@@ -31,16 +31,16 @@ export default function FeaturesGrid() {
         
         {/* Header */}
         <div className="flex flex-col items-center text-center gap-6">
-          <div className="liquid-glass rounded-full px-4 py-1 text-[10px] font-semibold uppercase tracking-widest text-white/70">
+          <div className="liquid-glass rounded-full px-5 py-2 text-[11px] font-black uppercase tracking-widest text-white border border-white/20 shadow-lg">
             Why Us
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-7xl font-heading italic text-white tracking-tight lead-[0.9]">
+          <h2 className="text-4xl md:text-5xl lg:text-7xl font-heading italic text-white tracking-tight lead-[0.9] drop-shadow-lg">
             The difference is everything.
           </h2>
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, idx) => (
             <motion.div
               key={idx}
@@ -48,14 +48,14 @@ export default function FeaturesGrid() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
               viewport={{ once: true }}
-              className="liquid-glass rounded-[2rem] p-8 flex flex-col items-start gap-8 group hover:bg-white/[0.03] transition-colors"
+              className="liquid-glass rounded-[2rem] p-10 flex flex-col items-start gap-8 group hover:bg-white/10 transition-all border border-white/5 shadow-xl hover:shadow-2xl hover:scale-[1.02]"
             >
-              <div className="liquid-glass-strong rounded-full w-12 h-12 flex items-center justify-center text-white shrink-0">
-                <feature.icon size={20} />
+              <div className="bg-white text-black rounded-full w-14 h-14 flex items-center justify-center shrink-0 shadow-lg">
+                <feature.icon size={24} />
               </div>
-              <div className="flex flex-col gap-4">
-                <h4 className="text-xl font-heading italic text-white">{feature.title}</h4>
-                <p className="text-white/50 font-body font-light text-sm leading-relaxed">
+              <div className="flex flex-col gap-5">
+                <h4 className="text-2xl font-heading italic text-white drop-shadow-sm">{feature.title}</h4>
+                <p className="text-white font-body font-bold text-sm leading-relaxed opacity-90">
                   {feature.description}
                 </p>
               </div>
