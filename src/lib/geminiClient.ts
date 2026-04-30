@@ -130,11 +130,16 @@ export async function callGemini(perfumeName: string, budget: string = "₹300")
   - suggest EXACT products (spray or attar) that cost less than ${budget}.
   - prioritize brands from our expanded 100+ brand list (Arabian Aroma, Vokka, Scentedelic, Ababel, Lattafa, Maison Alhambra, Heavenduft, XLNC, Indinoir, etc.).
   
-  PRODUCT NAMING REQUIREMENT:
-  - You MUST use the REAL name the dupe brand has given the product. 
-  - DO NOT write "Inspired by [Designer]" or "[Designer] Version". 
-  - Example: If searching for Sauvage, for Denver suggest "Hamilton", for Al Rehab suggest "Officer", for Armaf suggest "Ventana". 
-  - Using the designer name as the product name is a failure. Find the specific dupe name.
+  PRODUCT NAMING REQUIREMENT (CRITICAL):
+  - You MUST use the SPECIFIC name the dupe brand has given the product. 
+  - DO NOT use the designer perfume name as the product name. 
+  - EXAMPLE: For Arabian Aroma's Khamrah, you MUST write "Old Money". For Denver's Sauvage, write "Hamilton". For Wild Stone's ADG, write "Edge".
+  - If you name it the designer name, the user will be confused by the links. Find the ACTUAL brand name of the perfume.
+  
+  CHEAPEST LINK REQUIREMENT:
+  - You MUST list ALL known platforms where the product is sold at the lowest price.
+  - populate availableOn with ["Amazon", "Flipkart", "Meesho", "Official Website"] if they exist.
+  - prioritize finding the specific page on Meesho as it's often the cheapest for Indian clone houses.
   
   BRAND VARIETY REQUIREMENT:
   - DO NOT suggest the same brand twice for the same search if other high-quality options exist.
